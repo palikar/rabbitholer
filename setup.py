@@ -37,11 +37,11 @@ setup(
     url="https://github.com/palikar/rabbitholer",
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
-    # entry_points={
-    #     'console_scripts': [
-    #         'rabbitholer = rabbitholer.'
-    #     ]
-    # },
+    entry_points={
+        'console_scripts': [
+            'rabbitholer = rabbitholer.main.main'
+        ]
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

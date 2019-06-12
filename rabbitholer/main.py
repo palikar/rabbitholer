@@ -100,9 +100,45 @@ def get_arg_parser():
 
 
 
-
 def receive_msg(msg):
     print(msg)
+
+
+def monitor(args):
+    dump = RabbitDumper(args.exchange,
+                            args.queue,
+                            args.routing_key,
+                            args.server)
+    dump.receive(receive_msg)
+    dump.destroy()
+
+
+def read(args):
+    with RabbitDumper(args.exchange,
+                          args.queue,
+                          args.routing_key,
+                          args.server) as dump:
+        for line in sys.stdin:
+            dump.send(line[0:-1])
+
+
+def pipe(args):
+    pass
+
+
+
+    
+def send(args):
+    with RabbitDumper(args.exchange,
+                          args.queue,
+                          args.routing_key,
+                          args.server) as dump:
+
+        for m in args.messages:
+            dump.send(m)
+    
+    
+
 
     
 def main():
@@ -110,33 +146,18 @@ def main():
     args = parser.parse_args()
 
     if args.command == 'send':
-        with RabbitDumper(args.exchange,
-                          args.queue,
-                          args.routing_key,
-                          args.server) as dump:
-            for m in args.messages:
-                dump.send(m)
-
+        send(args)
         
-
     elif args.command == 'monitor':
-        dump = RabbitDumper(args.exchange,
-                            args.queue,
-                            args.routing_key,
-                            args.server)
-        dump.receive(receive_msg)
+        monitor(args)
 
-    elif args.command == 'monitor':
-        pass
+    elif args.command == 'read':
+        read(args)
 
+    elif args.command == 'pipe':
+        pipe(args)
     
 
-
-
-    
-    
-
-    # dump.destroy()
     # pipe_path = "/home/arnaud/rabit_pipe"
 
 
@@ -155,8 +176,7 @@ def main():
     # pipe_fd.close()
     
     
-    # for line in sys.stdin:
-    #     print(line, end="")
+    
 
 if __name__ == '__main__':
     main()
