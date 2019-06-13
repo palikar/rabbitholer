@@ -2,8 +2,9 @@
 
 import sys
 import setuptools
+import os
 from distutils.core import setup
-
+from rabbitholer.version import __version__
 
 
 def package_files(directory):
@@ -19,16 +20,14 @@ if sys.version_info < (3, 3):
     USING PYTHON {0}".format(sys.version))
     sys.exit(1)
 
-
-exec(open('rabbitholer/version.py').read())
-
 setup(
     name="rabbitholer",
     version=__version__,
     include_package_data=True,
     author="Stanislav Arnaudov",
     author_email="stanislv_ts@abv.bg",
-    description="A simple tool to send\receive messages to\from rabbitmq exchanges and queues",
+    description="A simple tool to send\receive messages to\from rabbitmq\
+    exchanges and queues",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
@@ -39,7 +38,7 @@ setup(
     tests_require=["pytest"],
     entry_points={
         'console_scripts': [
-            'rabbitholer = rabbitholer.main.main'
+            'rabbitholer = rabbitholer.main:main'
         ]
     },
     classifiers=[
