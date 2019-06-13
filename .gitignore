@@ -5,9 +5,10 @@ dist/
 *.pyo
 *.pyc
 
-tests/
 
 htmlcov/
 .coverage
+
+
 
 
