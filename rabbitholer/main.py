@@ -86,23 +86,26 @@ def get_arg_parser():
                                         Everything dumped into the pipe will be send to the RabbitMQ server',
                                         parents=[settings_parser])    
     parser_pipe.add_argument('pipe-name', default='./rabbitmq_pipe',
-                                help='The path to the named pipe to be created')
+                             help='The path to the named pipe to be created')
 
 
     
     parser_monitor = subparsers.add_parser('monitor',
-                                        help='Monitor the messges on an exchange',
-                                        description='Receive messages from a queue\
-                                        of an exchange and dump them on the stadard output (one message per line).',
-                                        parents=[settings_parser])
+                                           help='Monitor the messges on an exchange',
+                                           description='Receive messages from a queue\
+                                           of an exchange and dump them on the stadard output (one message per line).',
+                                           parents=[settings_parser])
 
     return parser
 
 
 
+
+
 def receive_msg(msg):
     print(msg)
-
+    
+    
 
 def monitor(args):
     dump = RabbitDumper(args.exchange,
@@ -123,11 +126,21 @@ def read(args):
 
 
 def pipe(args):
-    pass
+    pipe_path = args.pipe
+    if not os.path.exists(pipe_path):
+        os.mkfifo(pipe_path)
+    pipe_fd = open(pipe_path, 'r')
+    while True:
+        message = pipe_fd.readline()
+        if message:
+            print(message, end="")
+            time.sleep(0.5)
 
 
 
-    
+    pipe_fd.close()
+
+
 def send(args):
     with RabbitDumper(args.exchange,
                           args.queue,
@@ -158,22 +171,7 @@ def main():
         pipe(args)
     
 
-    # pipe_path = "/home/arnaud/rabit_pipe"
-
-
-    # if not os.path.exists(pipe_path):
-    #     os.mkfifo(pipe_path)
-
-    # pipe_fd = open(pipe_path, 'r')
-
     
-    # while True:
-    #     message = pipe_fd.readline()
-    #     if message:
-    #         print(message, end="")
-    #         time.sleep(0.5)
-
-    # pipe_fd.close()
     
     
     
