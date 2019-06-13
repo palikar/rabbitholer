@@ -33,13 +33,12 @@ help:
 	@echo 'make clean:        Remove the compiled files (*.pyc, *.pyo)'
 	@echo 'make test:         Test everything'
 	@echo 'make snapshot:     Create a tar.gz of the current git revision'
-	@echo 'make pypi_sdist:   Release a new sdist to PyPI'
+	@echo 'make dist_test:    Release a new sdist to Test PyPI'
 
 test: test_pylint test_flake
 	@echo "All test ran..."
 
 test_pylint:
-	@echo $(TEST_PATHS)
 	@echo "Running pylint..."
 	pylint $(TEST_PATHS)
 
@@ -62,12 +61,17 @@ clean:
 	find ./rabbitholer -depth -name __pycache__ -type d -exec rm -r -- {} \;
 	rm -rf ./build
 	rm -rf ./rabbitholer.egg-info
+	rm -rf ./dist
 
-build:
+build: compile
 	@echo 'Building the project'
 	$(PYTHON) setup.py build
 
-install:
+dist_test:
+	$(PYTHON) setup.py sdist bdist_wheel;
+	$(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+install: build
 	@echo 'Installing on the system'	
 	$(PYTHON) setup.py install $(SETUPOPTS)
 		--optimize=$(PYOPTIMIZE)
