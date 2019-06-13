@@ -42,30 +42,64 @@ Commands:
 
 Currently there are four supported commands: send, read, pipe and monitor. All commands have certain arguments that are common between all of them. Those instruct the application how to connect to the server. They include:
 
-| Argument           | Description                                                           |
-|------------------ |--------------------------------------------------------------------- |
-| `--server`, `-s`   | The IP of the RabbitMQ.\\ Standard port is assumed (5672).            |
-| `--exchange`, `-e` | The name of the exchange to be\\ declared while connecting.           |
-| `--queue`, `-q`    | The name of the queue to be\\ bound to the exchange while connecting. |
-| `--routing`, `-r`  | The routing key to be used\\ for outgoing messages.                   |
+| Argument           | Description                                                         |
+|------------------ |------------------------------------------------------------------- |
+| `--server`, `-s`   | The IP of the RabbitMQ. Standard port is assumed (5672).            |
+| `--exchange`, `-e` | The name of the exchange to be declared while connecting.           |
+| `--queue`, `-q`    | The name of the queue to be bound to the exchange while connecting. |
+| `--routing`, `-r`  | The routing key to be used for outgoing messages.                   |
 
-Different arguments may influence different commands. For example, when receiving messages, the routing key does not play a role. The exchange will be declared as non-passive, non-durable and non-auto-delete and of type **fanout**. This means that the application can connect to an existing exchange. To note is however that if the exchange already exists, it must be of type **fanout**. The queue will be declared as non-auto-delete. Both the exchange and the queue have default names of &ldquo;general&rdquo;. These are the names that will be used unless specified otherwise thought the command line arguments. You can read more about the RabbitMQ exchanges and queues [here (complete reference guide)](https://www.rabbitmq.com/amqp-0-9-1-reference.html) and [here (quick explantion of the AMQP model)](https://www.rabbitmq.com/tutorials/amqp-concepts.html)
-
-
-
-**send**:
+Different arguments may influence different commands. For example, when receiving messages, the routing key does not play a role. The exchange will be declared as non-passive, non-durable and non-auto-delete and of type **fanout**. This means that the application can connect to an existing exchange. To note is however that if the exchange already exists, it must be of type **fanout**. The queue will be declared as non-auto-delete. Both the exchange and the queue have default names of &ldquo;general&rdquo;. These are the names that will be used unless specified otherwise thought the command line arguments. If not specified, the routing key will be left as an empty string. You can read more about the RabbitMQ exchanges and queues [here (complete reference guide)](https://www.rabbitmq.com/amqp-0-9-1-reference.html) and [here (quick explantion of the AMQP model)](https://www.rabbitmq.com/tutorials/amqp-concepts.html).
 
 
 
-**read**:
+**send**: Simply sends a message to the specified exchange with the specified routing key.
+
+Intended to be used like:
+
+```sh
+rabbitholer send <msg>
+```
+
+Multiple messages can be send like:
+
+```sh
+rabbitholer send "<msg1>" "<msg2>" ...
+```
 
 
 
-**monitor**:
+**read**: Reads the standard output and dumps it on the specified exchange with the specified routing key. Each line is treated as a separate message.
+
+The intended use is something like:
+
+```sh
+echo '<msg>' | rabbitholer read
+```
 
 
 
-**pipe**:
+**monitor**: Reads messages from a queue and dumps them on the standard output - each message is on separate line.
+
+Example use:
+
+```sh
+rabbitholer read | grep "id:"
+```
+
+
+
+**pipe**: Creates a [named pipe](https://en.wikipedia.org/wiki/Named_pipe) connected to a running instance of the application. Any input to the pipe will be send as a message to the server. The intended use is:
+
+```sh
+rabbitholer pipe ./rabbithole
+```
+
+then you can do something like:
+
+```sh
+echo '<msg>' > ./rabbithole
+```
 
 
 ## Todos

@@ -61,35 +61,56 @@ Currently there are four supported commands: send, read, pipe and monitor. All c
 
 | Argument           | Description                                                         |
 |--------------------+---------------------------------------------------------------------|
-| =--server=, =-s=   | The IP of the RabbitMQ.\ Standard port is assumed (5672).           |
-| =--exchange=, =-e= | The name of the exchange to be\ declared while connecting.          |
-| =--queue=, =-q=    | The name of the queue to be\ bound to the exchange while connecting. |
-| =--routing=, =-r=  | The routing key to be used\ for outgoing messages.                  |
+| =--server=, =-s=   | The IP of the RabbitMQ. Standard port is assumed (5672).            |
+| =--exchange=, =-e= | The name of the exchange to be declared while connecting.           |
+| =--queue=, =-q=    | The name of the queue to be bound to the exchange while connecting. |
+| =--routing=, =-r=  | The routing key to be used for outgoing messages.                   |
 |--------------------+---------------------------------------------------------------------|
 
-Different arguments may influence different commands. For example, when receiving messages, the routing key does not play a role. The exchange will be declared as non-passive, non-durable and non-auto-delete and of type *fanout*. This means that the application can connect to an existing exchange. To note is however that if the exchange already exists, it must be of type *fanout*. The queue will be declared as non-auto-delete. Both the exchange and the queue have default names of "general". These are the names that will be used unless specified otherwise thought the command line arguments. You can read more about the RabbitMQ exchanges and queues [[https://www.rabbitmq.com/amqp-0-9-1-reference.html][here (complete reference guide)]] and [[https://www.rabbitmq.com/tutorials/amqp-concepts.html][here (quick explantion of the AMQP model)]]
+Different arguments may influence different commands. For example, when receiving messages, the routing key does not play a role. The exchange will be declared as non-passive, non-durable and non-auto-delete and of type *fanout*. This means that the application can connect to an existing exchange. To note is however that if the exchange already exists, it must be of type *fanout*. The queue will be declared as non-auto-delete. Both the exchange and the queue have default names of "general". These are the names that will be used unless specified otherwise thought the command line arguments. If not specified, the routing key will be left as an empty string. You can read more about the RabbitMQ exchanges and queues [[https://www.rabbitmq.com/amqp-0-9-1-reference.html][here (complete reference guide)]] and [[https://www.rabbitmq.com/tutorials/amqp-concepts.html][here (quick explantion of the AMQP model)]].
 
 \\
 
-*send*:
+*send*: Simply sends a message to the specified exchange with the specified routing key.
+
+Intended to be used like:
+#+BEGIN_SRC sh
+rabbitholer send <msg>
+#+END_SRC
+Multiple messages can be send like:
+#+BEGIN_SRC sh
+rabbitholer send "<msg1>" "<msg2>" ...
+#+END_SRC
 
 \\
 
-*read*:
+*read*: Reads the standard output and dumps it on the specified exchange with the specified routing key. Each line is treated as a separate message.
+
+The intended use is something like:
+#+BEGIN_SRC sh
+echo '<msg>' | rabbitholer read
+#+END_SRC
+
 
 \\
 
-*monitor*:
+*monitor*: Reads messages from a queue and dumps them on the standard output - each message is on separate line.
+
+Example use:
+#+BEGIN_SRC sh
+rabbitholer read | grep "id:"
+#+END_SRC
 
 \\
 
-*pipe*:
-
-
-** Todos
-
-[] Support for verbose logging
-[] Support for [[http://mqtt.org/][MQTT]] protocol.
-[] Support for configuration file.
+*pipe*: Creates a [[https://en.wikipedia.org/wiki/Named_pipe][named pipe]] connected to a running instance of the application. Any input to the pipe will be send as a message to the server.
+The intended use is:
+#+BEGIN_SRC sh
+rabbitholer pipe ./rabbithole
+#+END_SRC
+then you can do something like:
+#+BEGIN_SRC sh
+echo '<msg>' > ./rabbithole
+#+END_SRC
 
 #  LocalWords:  Rabbitholer Todos
