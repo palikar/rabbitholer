@@ -11,7 +11,7 @@ from rabbitholer.rabbit_dumper import RabbitDumper
 from rabbitholer.logger import setup_logging, debug, debug_cyan
 
 VERSION_MSG = [
-    'code-manager version: {0}'.format(VERSION),
+    'rabbitholer version: {0}'.format(VERSION),
     ('Python version: {0}'
      .format(' '.join(line.strip() for line in sys.version.splitlines()))),
     'Locale: {0}'.format('.'.join(str(s) for s in locale.getlocale())),
@@ -93,7 +93,7 @@ def get_arg_parser():
                                         to the RabbitMQ server',
                                         parents=[settings_parser])
     parser_pipe.add_argument('pipe_name', default='./rabbitmq_pipe',
-                             help='The path to the named\
+                             nargs='?', help='The path to the named\
                              pipe to be created')
 
     subparsers.add_parser('monitor',

@@ -24,6 +24,8 @@ CWD = $(shell pwd)
 
 TEST_PATHS =  $(shell find ./rabbitholer -mindepth 1 -maxdepth 1 ! -name '__pycache__')
 
+TEST_FILES = $(shell find tests -mindepth 1 -maxdepth 1  -type f -not -name '__*')
+
 
 help:
 	@echo 'make:              Test and compile rabbitholer.'
@@ -37,6 +39,10 @@ help:
 
 test: test_pylint test_flake8
 	@echo "All test ran..."
+
+test_pytest:
+	@echo "Running pytest..."
+	python -m pytest $(TEST_FILES)
 
 test_pylint:
 	@echo "Running pylint..."
