@@ -6,7 +6,7 @@ import argparse
 import time
 import locale
 
-import pika
+from contextlib import contextmanager
 
 from rabbitholer.version import VERSION
 from rabbitholer.rabbit_dumper import RabbitDumper
@@ -18,6 +18,7 @@ VERSION_MSG = [
      .format(' '.join(line.strip() for line in sys.version.splitlines()))),
     'Locale: {0}'.format('.'.join(str(s) for s in locale.getlocale())),
 ]
+
 
 DEFAULT_EXCHANGE = 'general'
 
@@ -93,8 +94,9 @@ def get_arg_parser():
                                         the pipe will be send\
                                         to the RabbitMQ server',
                                         parents=[settings_parser])
-    parser_pipe.add_argument('pipe-name', default='./rabbitmq_pipe',
-                             help='The path to the named pipe to be created')
+    parser_pipe.add_argument('pipe_name', default='./rabbitmq_pipe',
+                             help='The path to the named\
+                             pipe to be created')
 
     subparsers.add_parser('monitor',
                           help='Monitor the messges on an exchange',
@@ -128,15 +130,29 @@ def read(args):
 
 
 def pipe(args):
-    pipe_path = args.pipe
-    if not os.path.exists(pipe_path):
-        os.mkfifo(pipe_path)
-    with open(pipe_path, 'r') as pipe_fd:
-        while True:
-            message = pipe_fd.readline()
-            if message:
-                print(message, end="")
-                time.sleep(0.5)
+    path = args.pipe_name
+    if os.path.exists(path) or os.path.isfile(path):
+        print('The given path is already exists: {}'
+              .format(path))
+        exit(1)
+
+    with RabbitDumper(args.exchange,
+                      args.queue,
+                      args.routing_key,
+                      args.server) as dump:
+        try:
+            os.mkfifo(path)
+            with open(path, 'r') as pipe_fd:
+                while True:
+                    message = pipe_fd.readline()
+                    if message:
+                        dump.send(message)
+                        time.sleep(0.5)
+        except Exception as err:
+            print('Error wile opening pipe: {}'
+                  .format(err))
+        finally:
+            os.remove(path)
 
 
 def send(args):
@@ -153,7 +169,7 @@ COMMANDS = {}
 COMMANDS['send'] = send
 COMMANDS['monitor'] = monitor
 COMMANDS['read'] = read
-COMMANDS['pipe'] = pika
+COMMANDS['pipe'] = pipe
 
 
 def main():
