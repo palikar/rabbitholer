@@ -29,7 +29,9 @@ Rabbitholer is a very simple tool for communicating with a [[https://en.wikipedi
 I wrote this because I often had to debug RabbitMQ messages while working on different projects. The [[https://www.rabbitmq.com/management.html][web management plugin]] for RabbitMQ can be convenient but it doesn't really integrate with the other command line utilities I am used to ([[https://www.gnu.org/software/coreutils/][GNU core utilities]]). I've designed Rabbitholer along the lines of the [[http://minifesto.org/][minimalism idea]] because I wanted it to be as versatile as possible. Easy integration with other utilities is a core design principle here.
 
 
-** Install
+** Installation
+
+
 
 
 

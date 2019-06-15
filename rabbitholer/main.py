@@ -10,7 +10,7 @@ import pika
 
 from rabbitholer.version import VERSION
 from rabbitholer.rabbit_dumper import RabbitDumper
-from rabbitholer.logger import setup_logging, debug_cyan, debug, debug_red
+from rabbitholer.logger import setup_logging, debug
 
 VERSION_MSG = [
     'code-manager version: {0}'.format(VERSION),
@@ -33,6 +33,10 @@ def get_arg_parser():
                         help='Print veriosn inormation')
 
     parser.add_argument('--verbose', '-vv', dest='verbose',
+                        action="store_true", default=False,
+                        help='Print information about the execution.')
+
+    parser.add_argument('--very-verbose', '-vvv', dest='very_verbose',
                         action="store_true", default=False,
                         help='Print a lot of information about the execution.')
 
@@ -160,9 +164,7 @@ def main():
         parser.print_help()
         exit(0)
 
-    if args.verbose:
-        setup_logging(args)
-        debug_cyan('Verbose mode.')
+    setup_logging(args)
 
     debug('Command called: {}'.format(args.command))
     COMMANDS[args.command](args)
