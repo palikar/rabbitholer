@@ -6,11 +6,9 @@ import argparse
 import time
 import locale
 
-from contextlib import contextmanager
-
 from rabbitholer.version import VERSION
 from rabbitholer.rabbit_dumper import RabbitDumper
-from rabbitholer.logger import setup_logging, debug
+from rabbitholer.logger import setup_logging, debug, debug_cyan
 
 VERSION_MSG = [
     'code-manager version: {0}'.format(VERSION),
@@ -117,6 +115,7 @@ def monitor(args):
                       args.queue,
                       args.routing_key,
                       args.server) as dump:
+        debug_cyan('Monitoring for mesage:')
         dump.receive(receive_msg)
 
 
@@ -125,12 +124,14 @@ def read(args):
                       args.queue,
                       args.routing_key,
                       args.server) as dump:
+        debug_cyan('Reading the standard ouput.')
         for line in sys.stdin:
             dump.send(line[0:-1])
 
 
 def pipe(args):
     path = args.pipe_name
+    debug_cyan('Trying to open pipe on {}'.format(path))
     if os.path.exists(path) or os.path.isfile(path):
         print('The given path is already exists: {}'
               .format(path))
@@ -142,6 +143,7 @@ def pipe(args):
                       args.server) as dump:
         try:
             os.mkfifo(path)
+            debug('Pipe creted')
             with open(path, 'r') as pipe_fd:
                 while True:
                     message = pipe_fd.readline()
@@ -152,15 +154,17 @@ def pipe(args):
             print('Error wile opening pipe: {}'
                   .format(err))
         finally:
+            debug('Deliting trhe named pipe')
             os.remove(path)
 
 
 def send(args):
+    debug_cyan('Trying to send messages: [{}]'
+               .format(', '.join(args.messages)))
     with RabbitDumper(args.exchange,
                       args.queue,
                       args.routing_key,
                       args.server) as dump:
-
         for msg in args.messages:
             dump.send(msg)
 

@@ -15,7 +15,7 @@ def _setup_user_logger():
     logger = logging.getLogger('user_logger')
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('{1}%(asctime)s{2} [{0}%(levelname)s{2}]\
-        %(message)s'.format(CYAN, GREEN, RESET))
+ %(message)s'.format(CYAN, GREEN, RESET))
     sh_info = logging.StreamHandler(sys.stdout)
     sh_info.setFormatter(formatter)
     logger.addHandler(sh_info)
