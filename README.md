@@ -16,6 +16,22 @@ I wrote this because I often had to debug RabbitMQ messages while working on dif
 
 ## Installation
 
+The package is available on [PyPi](https://pypi.org/project/rabbitholer/). Through pip it can be installed with:
+
+```sh
+pip install rabbitholer
+```
+
+
+
+Installation from the source is also possible. Just clone the repository and execute the `install` target from the Makefile
+
+```cd
+git clone https://github.com/palikar/rabbitholer
+cd rabbitholer
+make install
+```
+
 
 ## Usage
 
