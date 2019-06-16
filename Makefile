@@ -84,6 +84,10 @@ dist_test:
 	$(PYTHON) setup.py sdist bdist_wheel;
 	$(PYTHON) -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
+dist:
+	$(PYTHON) setup.py sdist bdist_wheel;
+	$(PYTHON) -m twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+
 install: build
 	@echo 'Installing on the system'	
 	$(PYTHON) setup.py install $(SETUPOPTS)
