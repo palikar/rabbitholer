@@ -27,6 +27,11 @@ TEST_PATHS =  $(shell find ./rabbitholer -mindepth 1 -maxdepth 1 ! -name '__pyca
 TEST_FILES = $(shell find tests -mindepth 1 -maxdepth 1  -type f -not -name '__*')
 
 
+all : clean test compile build
+
+.PHONY: all
+
+
 help:
 	@echo 'make:              Test and compile rabbitholer.'
 	@echo 'make install:      Install $(NAME)'
@@ -81,5 +86,3 @@ install: build
 	@echo 'Installing on the system'	
 	$(PYTHON) setup.py install $(SETUPOPTS)
 		--optimize=$(PYOPTIMIZE)
-
-.PHONY: clean compile build install

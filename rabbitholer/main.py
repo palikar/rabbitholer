@@ -150,7 +150,7 @@ def pipe(args):
                     if message:
                         dump.send(message)
                         time.sleep(0.5)
-        except Exception as err:
+        except OSError as err:
             print('Error wile opening pipe: {}'
                   .format(err))
         finally:
@@ -161,6 +161,7 @@ def pipe(args):
 def send(args):
     debug_cyan('Trying to send messages: [{}]'
                .format(', '.join(args.messages)))
+
     with RabbitDumper(args.exchange,
                       args.queue,
                       args.routing_key,
