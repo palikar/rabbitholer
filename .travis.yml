@@ -1,12 +1,15 @@
-language: python
+dist: xenial
+language: 'python'
+
 python:
-  - "3.6"
+  - '3.5'
+  - '3.6'
+  - '3.7'
+  
+sudo: false
 
-sudo: false # this allows TravisCI to use the fast Docker build environment rather than the slower VMs
-
-install:
-  - pip3 install mock
-  - pip3 install -e .
+install: 
+  - 'pip install -r requirements.txt'
 
 script:
-  - python -m unittest discover --verbose
+  - 'make test'

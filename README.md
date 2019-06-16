@@ -2,6 +2,8 @@
 
 ![img](./down_the_whole.png)
 
+![img](https://travis-ci.org/palikar/rabbitholer.svg?branch=master)
+
 
 ## Abstract
 
@@ -12,7 +14,7 @@ Rabbitholer is a very simple tool for communicating with a [RebbiMQ](https://en.
 I wrote this because I often had to debug RabbitMQ messages while working on different projects. The [web management plugin](https://www.rabbitmq.com/management.html) for RabbitMQ can be convenient but it doesn&rsquo;t really integrate with the other command line utilities I am used to ([GNU core utilities](https://www.gnu.org/software/coreutils/)). I&rsquo;ve designed Rabbitholer along the lines of the [minimalism idea](http://minifesto.org/) because I wanted it to be as versatile as possible. Easy integration with other utilities is a core design principle here.
 
 
-## Install
+## Installation
 
 
 ## Usage
@@ -100,8 +102,3 @@ then you can do something like:
 ```sh
 echo '<msg>' > ./rabbithole
 ```
-
-
-## Todos
-
-[] Support for verbose logging [] Support for [MQTT](http://mqtt.org/) protocol. [] Support for configuration file.

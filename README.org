@@ -20,6 +20,8 @@
 * Rabbitholer
 [[./down_the_whole.png]]
 
+![[https://travis-ci.org/palikar/rabbitholer.svg?branch=master][img]]
+
 
 ** Abstract
 Rabbitholer is a very simple tool for communicating with a [[https://en.wikipedia.org/wiki/RabbitMQ][RebbiMQ]] server over [[https://en.wikipedia.org/wiki/Advanced_Message_Queuing_Protocol][AMQP]] protocol. It uses the [[https://pika.readthedocs.io/en/stable/][pika]] library for python and it offers convenient command line interface for sending and receiving messages to and from a RabbitMQ server instance. Rabbitholer is essentially a lightweight AMQP client.

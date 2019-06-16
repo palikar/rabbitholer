@@ -73,6 +73,8 @@ clean:
 	rm -rf ./build
 	rm -rf ./rabbitholer.egg-info
 	rm -rf ./dist
+	rm -rf ./install_log.txt
+	rm -rf ./htmlcov
 
 build: compile
 	@echo 'Building the project'
@@ -86,3 +88,9 @@ install: build
 	@echo 'Installing on the system'	
 	$(PYTHON) setup.py install $(SETUPOPTS)
 		--optimize=$(PYOPTIMIZE)
+
+coverage_html:
+	py.test --cov=rabbitholer --cov-report=html $(TEST_FILES)
+
+coverage:
+	py.test --cov=rabbitholer $(TEST_FILES)
