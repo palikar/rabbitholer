@@ -42,7 +42,7 @@ help:
 	@echo 'make snapshot:     Create a tar.gz of the current git revision'
 	@echo 'make dist_test:    Release a new sdist to Test PyPI'
 
-test: test_pylint test_flake8
+test: test_pylint test_flake8 test_pytest
 	@echo "All test ran..."
 
 test_pytest:
