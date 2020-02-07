@@ -5,6 +5,7 @@ import sys
 import argparse
 import time
 import locale
+import importlib
 
 from rabbitholer.version import VERSION
 from rabbitholer.rabbit_dumper import RabbitDumper
@@ -38,6 +39,11 @@ def get_arg_parser():
     parser.add_argument('--very-verbose', '-vvv', dest='very_verbose',
                         action="store_true", default=False,
                         help='Print a lot of information about the execution.')
+
+    parser.add_argument('--config', '-c', dest='config',
+                        action="store", default=None,
+                        help='Specify a configuration file. If not given,\
+ \'~/.config/rabbitholer/config.py\' will be used')
 
     settings_parser = argparse.ArgumentParser(add_help=False)
 
@@ -181,11 +187,43 @@ def main():
     parser = get_arg_parser()
     args = parser.parse_args()
 
+    setup_logging(args)
+
     if args.command is None:
         parser.print_help()
         exit(0)
 
-    setup_logging(args)
+    if not os.path.isdir(os.path.expanduser('~/.config/rabbitholer')):
+        os.makedirs(os.path.expanduser('~/.config/rabbitholer'))
+
+    if not os.path.isfile(
+            os.path.expanduser('~/.config/rabbitholer/config.py')):
+        with open(os.path.expanduser('~/.config/rabbitholer/config.py'), 'a'):
+            pass
+
+    config_file = '~/.config/rabbitholer/config.py'
+    if args.config is not None:
+        config_file = args.config
+
+    config_file = os.path.expanduser(config_file)
+    if not os.path.isfile(config_file):
+        print('Invalid config file: {}'.format(config_file))
+        exit(1)
+
+    config_spec = importlib.util.spec_from_file_location('config.module',
+                                                         config_file)
+    config = importlib.util.module_from_spec(config_spec)
+    config_spec.loader.exec_module(config)
+
+    args_dict = vars(args)
+    if not hasattr(config, 'config'):
+        debug('The configuration file does not define a config dict')
+        args_dict.update(config.config)
+
+    args_dict.update((k, os.environ[k]) for k in args_dict.keys() & os.environ.keys())
+
+    args_dict = argparse.Namespace(**args_dict)
+    print(args_dict)
 
     debug('Command called: {}'.format(args.command))
     COMMANDS[args.command](args)
