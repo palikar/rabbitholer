@@ -2,7 +2,7 @@
 
 ![img](./down_the_whole.png)
 
-![img](https://travis-ci.org/palikar/rabbitholer.svg?branch=master)
+![img](https://travis-ci.org/palikar/rabbitholer.svg?branch=master) ![img](https://pyup.io/repos/github/palikar/rabbitholer/shield.svg) ![img](https://pyup.io/repos/github/palikar/rabbitholer/python-3-shield.svg) ![img](https://coveralls.io/repos/github/palikar/rabbitholer/badge.svg?branch=master)
 
 
 ## Abstract
