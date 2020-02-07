@@ -8,7 +8,6 @@ from contextlib import contextmanager
 from rabbitholer.main import send
 from rabbitholer.main import read
 from rabbitholer.main import monitor
-from rabbitholer.main import pipe
 
 
 @contextmanager
