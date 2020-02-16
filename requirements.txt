@@ -1,5 +1,5 @@
 pika
-flake8
+flake8==3.7.9
 pylint
 mock
 coveralls
