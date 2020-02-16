@@ -11,5 +11,5 @@ more-itertools
 pluggy
 pyparsing
 pytest
-pytest-cov
+pytest-cov==2.8.1
 zipp
