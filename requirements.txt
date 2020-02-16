@@ -5,7 +5,7 @@ mock
 coveralls
 ## The following requirements were added by pip freeze:
 astroid
-coverage
+coverage==5.0.3
 importlib-metadata
 more-itertools
 pluggy
