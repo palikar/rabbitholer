@@ -8,7 +8,7 @@ astroid
 coverage
 importlib-metadata
 more-itertools
-pluggy
+pluggy==0.13.1
 pyparsing
 pytest
 pytest-cov
