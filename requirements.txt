@@ -1,6 +1,6 @@
 pika
 flake8
-pylint
+pylint==2.4.4
 mock
 coveralls
 ## The following requirements were added by pip freeze:
