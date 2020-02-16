@@ -7,7 +7,7 @@ coveralls
 astroid
 coverage
 importlib-metadata
-more-itertools
+more-itertools==8.2.0
 pluggy
 pyparsing
 pytest
