@@ -1,7 +1,7 @@
 pika
 flake8
 pylint
-mock
+mock==4.0.1
 coveralls
 ## The following requirements were added by pip freeze:
 astroid
