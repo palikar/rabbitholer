@@ -141,7 +141,7 @@ def pipe(args):
     if os.path.exists(path) or os.path.isfile(path):
         print('The given path is already exists: {}'
               .format(path))
-        exit(1)
+        sys.exit(1)
 
     with RabbitDumper(args.exchange,
                       args.queue,
@@ -191,7 +191,7 @@ def main():
 
     if args.command is None:
         parser.print_help()
-        exit(0)
+        sys.exit(0)
 
     if not os.path.isdir(os.path.expanduser('~/.config/rabbitholer')):
         os.makedirs(os.path.expanduser('~/.config/rabbitholer'))
@@ -208,7 +208,7 @@ def main():
     config_file = os.path.expanduser(config_file)
     if not os.path.isfile(config_file):
         print('Invalid config file: {}'.format(config_file))
-        exit(1)
+        sys.exit(1)
 
     config_spec = importlib.util.spec_from_file_location('config.module',
                                                          config_file)
