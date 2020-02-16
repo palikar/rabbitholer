@@ -12,4 +12,4 @@ pluggy
 pyparsing
 pytest
 pytest-cov
-zipp
+zipp==2.2.0
