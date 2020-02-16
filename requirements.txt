@@ -4,7 +4,7 @@ pylint
 mock
 coveralls
 ## The following requirements were added by pip freeze:
-astroid
+astroid==2.3.3
 coverage
 importlib-metadata
 more-itertools
