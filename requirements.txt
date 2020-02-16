@@ -10,6 +10,6 @@ importlib-metadata
 more-itertools
 pluggy
 pyparsing
-pytest
+pytest==5.3.5
 pytest-cov
 zipp
