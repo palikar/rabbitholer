@@ -71,14 +71,14 @@ def get_arg_parser():
 
     settings_parser.add_argument(
         '--routing', '-r', action='store',
-        metavar='Routing key', default='',
+        metavar='Routing key', default=None,
         required=False, dest='routing_key',
         help='The routing key of the message',
     )
 
     settings_parser.add_argument(
         '--queue', '-q', action='store',
-        metavar='Queue', default='general',
+        metavar='Queue', default=None,
         required=False, dest='queue',
         help='Queue to bind to the exchange',
     )
@@ -181,23 +181,13 @@ def receive_msg(msg):
 
 
 def monitor(args):
-    with RabbitDumper(
-        args.exchange,
-        args.queue,
-        args.routing_key,
-        args.server,
-    ) as dump:
+    with RabbitDumper(args) as dump:
         debug_cyan('Monitoring for mesage:')
         dump.receive(receive_msg)
 
 
 def read(args):
-    with RabbitDumper(
-        args.exchange,
-        args.queue,
-        args.routing_key,
-        args.server,
-    ) as dump:
+    with RabbitDumper(args) as dump:
         debug_cyan('Reading the standard ouput.')
         for line in sys.stdin:
             dump.send(line[0:-1])
@@ -213,12 +203,7 @@ def pipe(args):
         )
         sys.exit(1)
 
-    with RabbitDumper(
-        args.exchange,
-        args.queue,
-        args.routing_key,
-        args.server,
-    ) as dump:
+    with RabbitDumper(args) as dump:
         try:
             os.mkfifo(path)
             debug('Pipe creted')
@@ -244,12 +229,7 @@ def send(args):
         .format(', '.join(args.messages)),
     )
 
-    with RabbitDumper(
-        args.exchange,
-        args.queue,
-        args.routing_key,
-        args.server,
-    ) as dump:
+    with RabbitDumper(args) as dump:
         for msg in args.messages:
             dump.send(msg)
 
@@ -268,6 +248,8 @@ def main():
     args = parser.parse_args()
 
     setup_logging(args)
+
+    debug(f'{VERSION_MSG[0]}')
 
     if args.command is None:
         parser.print_help()
@@ -291,6 +273,8 @@ def main():
         print(f'Invalid config file: {config_file}')
         sys.exit(1)
 
+    debug(f'Config file: {config_file}')
+
     config_spec = importlib.util.spec_from_file_location(
         'config.module',
         config_file,
@@ -303,13 +287,15 @@ def main():
         debug('The configuration file does not define a config dict')
         args_dict.update(config.config)
 
+
     args_dict.update((k, os.environ[k])
                      for k in args_dict.keys() & os.environ.keys())
 
     args_dict = argparse.Namespace(**args_dict)
-    print(args_dict)
 
     debug(f'Command called: {args.command}')
+    debug(f'Arguments: {vars(args)}')
+    
     COMMANDS[args.command](args)
 
 

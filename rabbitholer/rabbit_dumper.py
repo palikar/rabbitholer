@@ -6,56 +6,65 @@ from rabbitholer.logger import debug_cyan
 
 class RabbitDumper:
 
-    def __init__(self, exchange, queue, routing_key, server):
+    def __init__(self, args):
 
-        self.exchange = exchange
-        self.queue = queue
-        self.routing_key = routing_key
-        self.server = server
+        self.exchange = args.exchange
+        self.queue = args.queue
+        self.routing_key = args.routing_key
+        self.server = args.server
 
         self.callback = None
 
-        debug_cyan(f'Trying to open connection to {server}')
+        debug_cyan(f'Trying to open connection to {args.server}')
         try:
-            self.connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=server),
-            )
+            try:
+                self.connection = pika.BlockingConnection(
+                    pika.ConnectionParameters(host=args.server),
+                )
+            except:
+                print('Establishing AMQP Connection failed! Check the server!')
+                exit(1)
+                
             debug('Connection opend')
 
             self.channel = self.connection.channel()
             self.channel.basic_qos(prefetch_count=1)
 
-            self.channel.exchange_declare(
-                exchange=self.exchange,
-                exchange_type='fanout',
-                passive=False,
-                durable=False,
-                auto_delete=False,
-            )
-            debug(f'Declared exchange with name {exchange}')
+            debug(f'Declared exchange with name {args.exchange}')
 
-            self.channel.queue_declare(queue=self.queue, auto_delete=False)
-            debug(f'Declared queue with name {queue}')
+            if self.queue:
+                self.queue = self.channel.queue_declare(queue=self.queue, auto_delete=True).method.queue
+            else:
+                self.queue = self.channel.queue_declare(queue='', auto_delete=True).method.queue
+                
+            debug(f'Declared queue with name {args.queue}')
 
-            self.channel.queue_bind(
+            if self.exchange is not None:
+                self.channel.queue_bind(
                 exchange=self.exchange,
-                queue=self.queue,
-                routing_key=self.routing_key,
-            )
-            debug('Queue was bound to the exchange')
+                    queue=self.queue,
+                    routing_key=self.routing_key,
+                )
+                debug('Queue was bound to the exchange {self.exchange}')
 
         except pika.exceptions.ConnectionClosedByBroker as err:
             print(f'AMQP Connection closed by the broker: {err}')
+            exit(1)
         except pika.exceptions.AMQPChannelError as err:
             print(f'AMQP channel error: {err}, stopping...')
+            exit(1)
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}')
+            exit(1)
+            
 
     def __enter__(self):
         return self
 
+
     def __exit__(self, *_):
         self.destroy()
+
 
     def new_msg(self, *args):
         debug_cyan(
@@ -64,12 +73,13 @@ class RabbitDumper:
         )
         self.callback(args[3].decode('utf-8'))
 
+
     def send(self, msg):
         debug_cyan(f'Trying to send message: {msg}.')
         try:
             props = pika.spec.BasicProperties(expiration='30000')
             self.channel.basic_publish(
-                exchange=self.exchange,
+                exchange=self.exchange if self.exchange else '',
                 routing_key=self.routing_key,
                 body=msg,
                 properties=props,
@@ -81,6 +91,7 @@ class RabbitDumper:
             print(f'AMQP channel error: {err}, stopping...')
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}')
+
 
     def receive(self, callback):
         self.callback = callback
@@ -100,6 +111,7 @@ class RabbitDumper:
             print(f'AMQP channel error: {err}.')
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}.')
+
 
     def destroy(self):
         debug_cyan('Closing connection to the broker.')
