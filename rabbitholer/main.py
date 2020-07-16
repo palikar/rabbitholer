@@ -10,6 +10,8 @@ from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
 from rabbitholer.logger import setup_logging
 from rabbitholer.rabbit_dumper import RabbitDumper
+from rabbitholer.record_play import play
+from rabbitholer.record_play import record
 from rabbitholer.version import VERSION
 
 VERSION_MSG = [
@@ -128,6 +130,7 @@ def get_arg_parser():
                                         to the RabbitMQ server',
         parents=[settings_parser],
     )
+
     parser_pipe.add_argument(
         'pipe_name', default='./rabbitmq_pipe',
         nargs='?', help='The path to the named\
@@ -141,6 +144,33 @@ def get_arg_parser():
                           of an exchange and dump them on the\
                           stadard output (one message per line).',
         parents=[settings_parser],
+    )
+
+    record_parser = subparsers.add_parser(
+        'record',
+        help='Record messages with specific routing key',
+        description='Save the messages coming to an exchange with specific routing key to\
+        a file on disk. The messages can then be replayed later.',
+        parents=[settings_parser],
+    )
+
+    record_parser.add_argument(
+        '--output', '-o', dest='output',
+        action='store', required=True, default='rabbitmq_msgs.msg',
+        help='The output file where the mesasges will be saved',
+    )
+
+    play_parser = subparsers.add_parser(
+        'play',
+        help='Replay previosly recorded massages',
+        description='Read messages from a given file\
+        and publish them on an exchange.',
+        parents=[settings_parser], )
+
+    play_parser.add_argument(
+        '--input', '-i', '-o', dest='input',
+        action='store', required=True, default='rabbitmq_msgs.msg',
+        help='The input file where the mesasges were previously stored',
     )
 
     return parser
@@ -229,6 +259,8 @@ COMMANDS['send'] = send
 COMMANDS['monitor'] = monitor
 COMMANDS['read'] = read
 COMMANDS['pipe'] = pipe
+COMMANDS['record'] = record
+COMMANDS['play'] = play
 
 
 def main():
