@@ -8,3 +8,4 @@ dist/
 
 htmlcov/
 .coverage
+.code_manager_cache
