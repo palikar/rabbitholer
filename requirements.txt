@@ -1,14 +1,14 @@
-pika
-flake8
-pylint
-mock
-coveralls
 ## The following requirements were added by pip freeze:
 astroid
 coverage
+coveralls
+flake8
 importlib-metadata
+mock
 more-itertools
+pika
 pluggy
+pylint
 pyparsing
 pytest
 pytest-cov

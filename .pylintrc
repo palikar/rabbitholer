@@ -11,4 +11,3 @@ max-line-length = 120
 disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme,cyclic-import,redefined-variable-type,stop-iteration-return
 
 [TYPECHECK]
-

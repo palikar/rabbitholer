@@ -89,7 +89,7 @@ dist:
 	$(PYTHON) -m twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
 
 install: build
-	@echo 'Installing on the system'	
+	@echo 'Installing on the system'
 	$(PYTHON) setup.py install $(SETUPOPTS)
 		--optimize=$(PYOPTIMIZE)
 

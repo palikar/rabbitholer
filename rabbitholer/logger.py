@@ -1,6 +1,5 @@
-import sys
-import logging
 import logging.handlers
+import sys
 
 
 RESET = '\033[0m'
@@ -14,8 +13,10 @@ RED = '\033[38;5;197m'
 def _setup_user_logger():
     logger = logging.getLogger('user_logger')
     logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('{1}%(asctime)s{2} [{0}%(levelname)s{2}]\
- %(message)s'.format(CYAN, GREEN, RESET))
+    formatter = logging.Formatter(
+        '{1}%(asctime)s{2} [{0}%(levelname)s{2}]\
+ %(message)s'.format(CYAN, GREEN, RESET),
+    )
     sh_info = logging.StreamHandler(sys.stdout)
     sh_info.setFormatter(formatter)
     logger.addHandler(sh_info)
@@ -24,8 +25,10 @@ def _setup_user_logger():
 def _setup_global_logger():
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('{1}%(asctime)s{2} [{0}%(levelname)s{2}]\
-        %(message)s'.format(CYAN, GREEN, RESET))
+    formatter = logging.Formatter(
+        '{1}%(asctime)s{2} [{0}%(levelname)s{2}]\
+        %(message)s'.format(CYAN, GREEN, RESET),
+    )
     sh_info = logging.StreamHandler(sys.stdout)
     sh_info.setFormatter(formatter)
     logger.addHandler(sh_info)
