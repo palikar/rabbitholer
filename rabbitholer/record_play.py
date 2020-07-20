@@ -1,7 +1,9 @@
+import time
 import pickle
 import sys
 
 from rabbitholer.logger import debug_cyan
+from rabbitholer.logger import debug
 from rabbitholer.rabbit_dumper import RabbitDumper
 
 
@@ -44,20 +46,17 @@ class MsgPickler:
         self.flush()
 
 
+
 def play(args):
-    with open(args.input, 'rb') as fd:
+    with  RabbitDumper(args) as dump, open(args.input, 'rb') as fd:
         try:
             while 1:
                 msg = pickle.load(fd)
-                print(f'{msg.timestamp}')
-
+                debug(f'Sending message with key {msg.routing_key} to exchange {msg.routing_key}')
+                dump.send(f'{msg.body}', headers=msg.props, key=msg.routing_key)
+                time.sleep(0.3)
         except EOFError:
             pass
-
-    # with RabbitDumper(args) as dump,:
-    #     for msg in fd.read().splitlines():
-    #         dump.send(msg)
-
 
 def log_message(pickler, method, props, msg):
     msg = Message(msg, props.headers, method.exchange, method.routing_key)

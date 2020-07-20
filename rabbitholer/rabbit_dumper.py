@@ -55,13 +55,12 @@ class RabbitDumper:
         else:
             self.callback(body.decode('utf-8'))
 
-    def send(self, msg):
-        debug_cyan(f'Trying to send message: {msg}.')
+    def send(self, msg, headers=None, key=None):
         try:
-            props = pika.spec.BasicProperties(expiration='30000')
+            props = pika.spec.BasicProperties(expiration='30000', headers=headers)
             self.channel.basic_publish(
                 exchange=self.exchange if self.exchange else '',
-                routing_key=self.routing_key,
+                routing_key=self.routing_key if not key else key,
                 body=msg,
                 properties=props,
             )
