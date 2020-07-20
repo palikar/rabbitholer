@@ -1,9 +1,9 @@
-import time
 import pickle
 import sys
+import time
 
-from rabbitholer.logger import debug_cyan
 from rabbitholer.logger import debug
+from rabbitholer.logger import debug_cyan
 from rabbitholer.rabbit_dumper import RabbitDumper
 
 
@@ -46,9 +46,8 @@ class MsgPickler:
         self.flush()
 
 
-
 def play(args):
-    with  RabbitDumper(args) as dump, open(args.input, 'rb') as fd:
+    with RabbitDumper(args) as dump, open(args.input, 'rb') as fd:
         try:
             while 1:
                 msg = pickle.load(fd)
@@ -57,6 +56,7 @@ def play(args):
                 time.sleep(0.3)
         except EOFError:
             pass
+
 
 def log_message(pickler, method, props, msg):
     msg = Message(msg, props.headers, method.exchange, method.routing_key)
