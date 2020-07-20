@@ -287,7 +287,6 @@ def main():
         debug('The configuration file does not define a config dict')
         args_dict.update(config.config)
 
-
     args_dict.update((k, os.environ[k])
                      for k in args_dict.keys() & os.environ.keys())
 
@@ -295,7 +294,7 @@ def main():
 
     debug(f'Command called: {args.command}')
     debug(f'Arguments: {vars(args)}')
-    
+
     COMMANDS[args.command](args)
 
 

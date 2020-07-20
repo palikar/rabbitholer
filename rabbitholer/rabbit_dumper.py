@@ -21,31 +21,14 @@ class RabbitDumper:
                 self.connection = pika.BlockingConnection(
                     pika.ConnectionParameters(host=args.server),
                 )
-            except:
+            except:  # noqa: E722
                 print('Establishing AMQP Connection failed! Check the server!')
                 exit(1)
-                
+
             debug('Connection opend')
 
             self.channel = self.connection.channel()
             self.channel.basic_qos(prefetch_count=1)
-
-            debug(f'Declared exchange with name {args.exchange}')
-
-            if self.queue:
-                self.queue = self.channel.queue_declare(queue=self.queue, auto_delete=True).method.queue
-            else:
-                self.queue = self.channel.queue_declare(queue='', auto_delete=True).method.queue
-                
-            debug(f'Declared queue with name {args.queue}')
-
-            if self.exchange is not None:
-                self.channel.queue_bind(
-                exchange=self.exchange,
-                    queue=self.queue,
-                    routing_key=self.routing_key,
-                )
-                debug('Queue was bound to the exchange {self.exchange}')
 
         except pika.exceptions.ConnectionClosedByBroker as err:
             print(f'AMQP Connection closed by the broker: {err}')
@@ -56,23 +39,16 @@ class RabbitDumper:
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}')
             exit(1)
-            
 
     def __enter__(self):
         return self
 
-
     def __exit__(self, *_):
         self.destroy()
 
-
-    def new_msg(self, *args):
-        debug_cyan(
-            'New message received: {}'
-            .format(args[3]),
-        )
-        self.callback(args[3].decode('utf-8'))
-
+    def new_msg(self, _, _, _, body):  # noqa: F831
+        debug_cyan(f'New message received: {body}')
+        self.callback(body.decode('utf-8'))
 
     def send(self, msg):
         debug_cyan(f'Trying to send message: {msg}.')
@@ -92,13 +68,27 @@ class RabbitDumper:
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}')
 
-
     def receive(self, callback):
         self.callback = callback
-        debug_cyan(
-            'Starting to recieve messages from {}'
-            .format(self.queue),
-        )
+
+        if self.queue:
+            self.queue = self.channel.queue_declare(queue=self.queue, auto_delete=True).method.queue
+        else:
+            self.queue = self.channel.queue_declare(queue='', auto_delete=True).method.queue
+
+        debug(f'Declared queue with name {self.queue}')
+
+        if self.exchange is not None:
+            self.channel.queue_bind(
+                exchange=self.exchange,
+                queue=self.queue,
+                routing_key=self.routing_key,
+            )
+            debug('Queue was bound to the exchange {self.exchange} with\
+            routing key {self.routing_key}')
+
+        debug_cyan(f'Starting to recieve messages from {self.queue}')
+
         try:
             self.channel.basic_consume(
                 queue=self.queue, on_message_callback=self.new_msg,
@@ -111,7 +101,6 @@ class RabbitDumper:
             print(f'AMQP channel error: {err}.')
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}.')
-
 
     def destroy(self):
         debug_cyan('Closing connection to the broker.')
