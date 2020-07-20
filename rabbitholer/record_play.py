@@ -22,7 +22,11 @@ class MsgPickler:
         self.output = output
 
         self.cache = []
-        self.dirty = False
+        self.dirty = True
+
+        msg = Message(None, None, None, None)
+        msg.timestamp = time.time()
+        self.cache.append(msg)
 
     def push_msg(self, msg):
         self.cache.append(msg)
@@ -51,17 +55,23 @@ def play(args):
         try:
             while 1:
                 msg = pickle.load(fd)
+
+                if msg.body is None:
+                    prev_time = msg.timestamp
+                    continue
+
                 debug(f'Sending message with key {msg.routing_key} to exchange {msg.routing_key}')
                 dump.send(f'{msg.body}', headers=msg.props, key=msg.routing_key)
-                time.sleep(0.3)
+
+                time.sleep(msg.timestamp - prev_time)
+                prev_time = msg.timestamp
         except EOFError:
             pass
 
 
 def log_message(pickler, method, props, msg):
     msg = Message(msg, props.headers, method.exchange, method.routing_key)
-    msg.timestamp = props.timestamp
-
+    msg.timestamp = props.timestamp if props.timestamp else time.time()
     debug_cyan(f'Saving message from {method.exchange} and with key {method.routing_key}')
 
     pickler.push_msg(msg)
