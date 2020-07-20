@@ -42,6 +42,7 @@ class MsgPickler:
             for msg in self.cache:
                 pickle.dump(msg, fd)
         self.cache.clear()
+        self.dirty = False
 
     def __enter__(self):
         return self
@@ -73,7 +74,6 @@ def log_message(pickler, method, props, msg):
     msg = Message(msg, props.headers, method.exchange, method.routing_key)
     msg.timestamp = props.timestamp if props.timestamp else time.time()
     debug_cyan(f'Saving message from {method.exchange} and with key {method.routing_key}')
-
     pickler.push_msg(msg)
 
 
