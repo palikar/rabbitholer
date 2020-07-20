@@ -1,3 +1,5 @@
+import sys
+
 import pika
 
 from rabbitholer.logger import debug
@@ -23,7 +25,7 @@ class RabbitDumper:
                 )
             except:  # noqa: E722
                 print('Establishing AMQP Connection failed! Check the server!')
-                exit(1)
+                sys.exit(1)
 
             debug('Connection opend')
 
@@ -32,13 +34,13 @@ class RabbitDumper:
 
         except pika.exceptions.ConnectionClosedByBroker as err:
             print(f'AMQP Connection closed by the broker: {err}')
-            exit(1)
+            sys.exit(1)
         except pika.exceptions.AMQPChannelError as err:
             print(f'AMQP channel error: {err}, stopping...')
-            exit(1)
+            sys.exit(1)
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}')
-            exit(1)
+            sys.exit(1)
 
     def __enter__(self):
         return self
@@ -46,9 +48,12 @@ class RabbitDumper:
     def __exit__(self, *_):
         self.destroy()
 
-    def new_msg(self, _, _, _, body):  # noqa: F831
+    def new_msg(self, _, method, properties, body):  # noqa: F831
         debug_cyan(f'New message received: {body}')
-        self.callback(body.decode('utf-8'))
+        if self.full_msg:
+            self.callback(method, properties, body.decode('utf-8'))
+        else:
+            self.callback(body.decode('utf-8'))
 
     def send(self, msg):
         debug_cyan(f'Trying to send message: {msg}.')
@@ -68,8 +73,9 @@ class RabbitDumper:
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}')
 
-    def receive(self, callback):
+    def receive(self, callback, full_msg=False):
         self.callback = callback
+        self.full_msg = full_msg
 
         if self.queue:
             self.queue = self.channel.queue_declare(queue=self.queue, auto_delete=True).method.queue
