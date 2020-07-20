@@ -1,4 +1,5 @@
 import pickle
+import sys
 
 from rabbitholer.logger import debug_cyan
 from rabbitholer.rabbit_dumper import RabbitDumper
@@ -23,40 +24,59 @@ class MsgPickler:
 
     def push_msg(self, msg):
         self.cache.append(msg)
-        self.dirty = False
+        self.dirty = True
         if len(self.cache) > 20:
             self.flush()
 
     def flush(self):
         if not self.dirty:
             return
-        for msg in self.cache:
-            with open(self.output, 'ab') as fd:
+        with open(self.output, 'ab') as fd:
+            debug_cyan(f'Flushing messages in {self.output}')
+            for msg in self.cache:
                 pickle.dump(msg, fd)
         self.cache.clear()
 
     def __enter__(self):
-        pass
+        return self
 
-    def __exit__(self):
+    def __exit__(self, *_):
         self.flush()
 
 
 def play(args):
-    with RabbitDumper(args) as dump, open(args.input) as fd:
-        for msg in fd.read().splitlines():
-            dump.send(msg)
+    with open(args.input, 'rb') as fd:
+        try:
+            while 1:
+                msg = pickle.load(fd)
+                print(f'{msg.timestamp}')
+
+        except EOFError:
+            pass
+
+    # with RabbitDumper(args) as dump,:
+    #     for msg in fd.read().splitlines():
+    #         dump.send(msg)
 
 
 def log_message(pickler, method, props, msg):
-    pops_map = {}
-    for field, val in props:
-        pops_map[field] = val
-    msg = Message(msg, pops_map, method.exchange, method.routing_ley)
+    msg = Message(msg, props.headers, method.exchange, method.routing_key)
+    msg.timestamp = props.timestamp
+
+    debug_cyan(f'Saving message from {method.exchange} and with key {method.routing_key}')
+
     pickler.push_msg(msg)
 
 
 def record(args):
-    with RabbitDumper(args) as dump, MsgPickler(args.output) as pickler:
-        debug_cyan('Recording messages...')
-        dump.receive(lambda mthd, prop, msg: log_message(pickler, mthd, prop, msg))
+    try:
+        with RabbitDumper(args) as dump, MsgPickler(args.output) as pickler:
+            debug_cyan('Recording messages...')
+            dump.receive(
+                lambda mthd, prop, msg: log_message(
+                    pickler, mthd, prop, msg,
+                ), full_msg=True,
+            )
+    except KeyboardInterrupt:
+        print('')
+        sys.exit(0)

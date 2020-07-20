@@ -181,16 +181,24 @@ def receive_msg(msg):
 
 
 def monitor(args):
-    with RabbitDumper(args) as dump:
-        debug_cyan('Monitoring for mesage:')
-        dump.receive(receive_msg)
+    try:
+        with RabbitDumper(args) as dump:
+            debug_cyan('Monitoring for mesage:')
+            dump.receive(receive_msg)
+    except KeyboardInterrupt:
+        print('')
+        sys.exit(0)
 
 
 def read(args):
-    with RabbitDumper(args) as dump:
-        debug_cyan('Reading the standard ouput.')
-        for line in sys.stdin:
-            dump.send(line[0:-1])
+    try:
+        with RabbitDumper(args) as dump:
+            debug_cyan('Reading the standard ouput.')
+            for line in sys.stdin:
+                dump.send(line[0:-1])
+    except KeyboardInterrupt:
+        print('')
+        sys.exit(0)
 
 
 def pipe(args):
