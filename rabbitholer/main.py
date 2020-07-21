@@ -9,11 +9,11 @@ import time
 from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
 from rabbitholer.logger import setup_logging
+from rabbitholer.msg_printer import MessagePrinter
 from rabbitholer.rabbit_dumper import RabbitDumper
+from rabbitholer.record_play import list_messges
 from rabbitholer.record_play import play
 from rabbitholer.record_play import record
-from rabbitholer.record_play import list_messges
-from rabbitholer.msg_printer import MessagePrinter
 from rabbitholer.version import VERSION
 
 VERSION_MSG = [
@@ -60,7 +60,7 @@ def get_arg_parser():
         help='Specify a configuration file. If not given,\
  \'~/.config/rabbitholer/config.py\' will be used',
     )
-    
+
     settings_parser = argparse.ArgumentParser(add_help=False)
 
     settings_parser.add_argument(
@@ -95,13 +95,11 @@ def get_arg_parser():
 
     printer_parser = argparse.ArgumentParser(add_help=False)
 
-    
     printer_parser.add_argument(
         '--format', '-f', action='store', default=None,
         required=False, dest='format',
         help='Format string for the printed messages.',
     )
-
 
     subparsers = parser.add_subparsers(
         title='Commands', description='A list\
@@ -191,7 +189,6 @@ def get_arg_parser():
         help='The input file where the mesasges were previously stored',
     )
 
-    
     list_parser = subparsers.add_parser(
         'list-msgs',
         help='Print recorded messages',
@@ -204,8 +201,8 @@ def get_arg_parser():
         help='The input file where the mesasges were previously stored',
     )
 
-
     return parser
+
 
 def monitor(args):
     try:

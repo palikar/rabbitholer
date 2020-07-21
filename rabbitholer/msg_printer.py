@@ -1,14 +1,12 @@
-
 class MessagePrinter:
 
     def __init__(self, args):
         self.args = args
         self.format = args.format
-        
 
     def format_msg(self, msg):
         string = self.format
-        
+
         # TODO: Fix this, this is bad
         string = string.replace('%%', '%')
         string = string.replace('%b', str(msg.body))

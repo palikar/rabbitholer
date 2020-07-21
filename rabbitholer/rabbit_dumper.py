@@ -1,8 +1,10 @@
 import sys
+
 import pika
 
 from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
+
 
 class Message:
 
@@ -14,6 +16,7 @@ class Message:
 
         def __repr__(self):
             return self.body
+
 
 class RabbitDumper:
 
@@ -64,7 +67,7 @@ class RabbitDumper:
         debug_cyan(f'New message received: {log}')
         msg = Message(body.decode('utf-8'), properties.headers, method.exchange, method.routing_key)
         self.callback(msg)
-        
+
     def send(self, msg, headers=None, key=None):
         try:
             props = pika.spec.BasicProperties(expiration='30000', headers=headers)

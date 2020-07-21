@@ -4,9 +4,9 @@ import time
 
 from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
-from rabbitholer.rabbit_dumper import RabbitDumper
-from rabbitholer.rabbit_dumper import Message
 from rabbitholer.msg_printer import MessagePrinter
+from rabbitholer.rabbit_dumper import Message
+from rabbitholer.rabbit_dumper import RabbitDumper
 
 
 class MsgPickler:
@@ -69,7 +69,7 @@ def play(args):
             pass
 
 
-def log_message(msg):
+def log_message(pickler, msg):
     msg.timestamp = msg.props.timestamp if msg.props.timestamp else time.time()
     debug_cyan(f'Saving message from {msg.exchange} and with key {msg.routing_key}')
     pickler.push_msg(msg)
@@ -79,7 +79,7 @@ def record(args):
     try:
         with RabbitDumper(args) as dump, MsgPickler(args) as pickler:
             debug_cyan('Recording messages...')
-            dump.receive(lambda msg: log_message(msg), full_msg=True)
+            dump.receive(lambda msg: log_message(pickler, msg), full_msg=True)
     except KeyboardInterrupt:
         print('')
         sys.exit(0)
@@ -93,8 +93,6 @@ def list_messges(args):
                 msg = pickle.load(fd)
                 if msg.body is None:
                     continue
-                printer.print_message(msg)                
+                printer.print_message(msg)
     except EOFError:
         pass
-
-    
