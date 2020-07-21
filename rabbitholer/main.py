@@ -35,19 +35,19 @@ def get_arg_parser():
     )
 
     parser.add_argument(
-        '--version', '-v', action='version',
+        '--version', '-V', action='version',
         version=('\n'.join(VERSION_MSG)),
         help='Print veriosn inormation',
     )
 
     parser.add_argument(
-        '--verbose', '-vv', dest='verbose',
+        '--verbose', '-v', dest='verbose',
         action='store_true', default=False,
         help='Print information about the execution.',
     )
 
     parser.add_argument(
-        '--very-verbose', '-vvv', dest='very_verbose',
+        '--very-verbose', '-vv', dest='very_verbose',
         action='store_true', default=False,
         help='Print a lot of information about the execution.',
     )
@@ -160,6 +160,12 @@ def get_arg_parser():
         help='The output file where the mesasges will be saved',
     )
 
+    record_parser.add_argument(
+        '--append', '-a', dest='append',
+        action='store_true', required=True, default=False,
+        help='Append the recorded messages to the output given file.',
+    )
+
     play_parser = subparsers.add_parser(
         'play',
         help='Replay previosly recorded massages',
@@ -183,7 +189,7 @@ def receive_msg(msg):
 def monitor(args):
     try:
         with RabbitDumper(args) as dump:
-            debug_cyan('Monitoring for mesage:')
+            debug_cyan('Monitoring for messages:')
             dump.receive(receive_msg)
     except KeyboardInterrupt:
         print('')
@@ -293,8 +299,8 @@ def main():
     args_dict = vars(args)
     if not hasattr(config, 'config'):
         debug('The configuration file does not define a config dict')
-        args_dict.update(config.config)
 
+    args_dict.update(config.config)
     args_dict.update((k, os.environ[k])
                      for k in args_dict.keys() & os.environ.keys())
 

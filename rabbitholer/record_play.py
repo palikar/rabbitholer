@@ -18,11 +18,18 @@ class Message:
 
 class MsgPickler:
 
-    def __init__(self, output):
-        self.output = output
+    def __init__(self, args):
+        self.args = args
+
+        self.output = args.output
+        self.append = args.append
 
         self.cache = []
         self.dirty = True
+
+        if not self.append:
+            with open(self.output, 'wb'):
+                pass
 
         msg = Message(None, None, None, None)
         msg.timestamp = time.time()
@@ -63,7 +70,6 @@ def play(args):
 
                 debug(f'Sending message with key {msg.routing_key} to exchange {msg.routing_key}')
                 dump.send(f'{msg.body}', headers=msg.props, key=msg.routing_key)
-
                 time.sleep(msg.timestamp - prev_time)
                 prev_time = msg.timestamp
         except EOFError:

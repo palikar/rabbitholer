@@ -10,6 +10,8 @@ class RabbitDumper:
 
     def __init__(self, args):
 
+        self.args = args
+
         self.exchange = args.exchange
         self.queue = args.queue
         self.routing_key = args.routing_key
@@ -49,7 +51,8 @@ class RabbitDumper:
         self.destroy()
 
     def new_msg(self, _, method, properties, body):  # noqa: F831
-        debug_cyan(f'New message received: {body}')
+        log = body if len(body) < 10 else body[:9] + '...'
+        debug_cyan(f'New message received: {log}')
         if self.full_msg:
             self.callback(method, properties, body.decode('utf-8'))
         else:
@@ -89,8 +92,8 @@ class RabbitDumper:
                 queue=self.queue,
                 routing_key=self.routing_key,
             )
-            debug('Queue was bound to the exchange {self.exchange} with\
-            routing key {self.routing_key}')
+            debug(f'Queue was bound to the exchange {self.exchange} with\
+routing key {self.routing_key}')
 
         debug_cyan(f'Starting to recieve messages from {self.queue}')
 
@@ -106,6 +109,8 @@ class RabbitDumper:
             print(f'AMQP channel error: {err}.')
         except pika.exceptions.AMQPConnectionError as err:
             print(f'AMQP Connection closed: {err}.')
+        except pika.exceptions.StreamLostError as err:
+            print(f'AMQP Stream lost: {err}.')
 
     def destroy(self):
         debug_cyan('Closing connection to the broker.')
