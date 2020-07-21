@@ -5,15 +5,8 @@ import time
 from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
 from rabbitholer.rabbit_dumper import RabbitDumper
-
-
-class Message:
-
-    def __init__(self, body, props, exchange, routing_key):
-        self.body = body
-        self.props = props
-        self.exchange = exchange
-        self.routing_key = routing_key
+from rabbitholer.rabbit_dumper import Message
+from rabbitholer.msg_printer import MessagePrinter
 
 
 class MsgPickler:
@@ -76,10 +69,9 @@ def play(args):
             pass
 
 
-def log_message(pickler, method, props, msg):
-    msg = Message(msg, props.headers, method.exchange, method.routing_key)
-    msg.timestamp = props.timestamp if props.timestamp else time.time()
-    debug_cyan(f'Saving message from {method.exchange} and with key {method.routing_key}')
+def log_message(msg):
+    msg.timestamp = msg.props.timestamp if msg.props.timestamp else time.time()
+    debug_cyan(f'Saving message from {msg.exchange} and with key {msg.routing_key}')
     pickler.push_msg(msg)
 
 
@@ -87,16 +79,22 @@ def record(args):
     try:
         with RabbitDumper(args) as dump, MsgPickler(args) as pickler:
             debug_cyan('Recording messages...')
-            dump.receive(
-                lambda mthd, prop, msg: log_message(
-                    pickler, mthd, prop, msg,
-                ), full_msg=True,
-            )
+            dump.receive(lambda msg: log_message(msg), full_msg=True)
     except KeyboardInterrupt:
         print('')
         sys.exit(0)
 
 
 def list_messges(args):
-    pass
+    try:
+        with open(args.file, 'rb') as fd:
+            printer = MessagePrinter(args)
+            while 1:
+                msg = pickle.load(fd)
+                if msg.body is None:
+                    continue
+                printer.print_message(msg)                
+    except EOFError:
+        pass
+
     

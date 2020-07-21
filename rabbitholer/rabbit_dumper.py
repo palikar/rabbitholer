@@ -1,10 +1,19 @@
 import sys
-
 import pika
 
 from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
 
+class Message:
+
+    def __init__(self, body, props, exchange, routing_key):
+        self.body = body
+        self.props = props
+        self.exchange = exchange
+        self.routing_key = routing_key
+
+        def __repr__(self):
+            return self.body
 
 class RabbitDumper:
 
@@ -53,11 +62,9 @@ class RabbitDumper:
     def new_msg(self, _, method, properties, body):  # noqa: F831
         log = body if len(body) < 10 else body[:9].decode('utf-8') + '...'
         debug_cyan(f'New message received: {log}')
-        if self.full_msg:
-            self.callback(method, properties, body.decode('utf-8'))
-        else:
-            self.callback(body.decode('utf-8'))
-
+        msg = Message(body.decode('utf-8'), properties.headers, method.exchange, method.routing_key)
+        self.callback(msg)
+        
     def send(self, msg, headers=None, key=None):
         try:
             props = pika.spec.BasicProperties(expiration='30000', headers=headers)

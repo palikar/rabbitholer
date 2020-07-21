@@ -13,6 +13,7 @@ from rabbitholer.rabbit_dumper import RabbitDumper
 from rabbitholer.record_play import play
 from rabbitholer.record_play import record
 from rabbitholer.record_play import list_messges
+from rabbitholer.msg_printer import MessagePrinter
 from rabbitholer.version import VERSION
 
 VERSION_MSG = [
@@ -59,7 +60,7 @@ def get_arg_parser():
         help='Specify a configuration file. If not given,\
  \'~/.config/rabbitholer/config.py\' will be used',
     )
-
+    
     settings_parser = argparse.ArgumentParser(add_help=False)
 
     settings_parser.add_argument(
@@ -91,6 +92,16 @@ def get_arg_parser():
         help='The server where the\
                                  RabbiMQ server is running',
     )
+
+    printer_parser = argparse.ArgumentParser(add_help=False)
+
+    
+    printer_parser.add_argument(
+        '--format', '-f', action='store', default=None,
+        required=False, dest='format',
+        help='Format string for the printed messages.',
+    )
+
 
     subparsers = parser.add_subparsers(
         title='Commands', description='A list\
@@ -144,7 +155,7 @@ def get_arg_parser():
         description='Receive messages from a queue\
                           of an exchange and dump them on the\
                           stadard output (one message per line).',
-        parents=[settings_parser],
+        parents=[settings_parser, printer_parser],
     )
 
     record_parser = subparsers.add_parser(
@@ -181,12 +192,14 @@ def get_arg_parser():
     )
 
     
-    play_parser = subparsers.add_parser(
+    list_parser = subparsers.add_parser(
         'list-msgs',
         help='Print recorded messages',
-        description='Print the recorded messages in a file to the standard output')
+        description='Print the recorded messages in a file to the standard output',
+        parents=[printer_parser],
+    )
 
-    play_parser.add_argument(
+    list_parser.add_argument(
         'file', action='store',
         help='The input file where the mesasges were previously stored',
     )
@@ -194,16 +207,12 @@ def get_arg_parser():
 
     return parser
 
-
-def receive_msg(msg):
-    print(msg)
-
-
 def monitor(args):
     try:
+        printer = MessagePrinter(args)
         with RabbitDumper(args) as dump:
             debug_cyan('Monitoring for messages:')
-            dump.receive(receive_msg)
+            dump.receive(lambda msg: printer.print_message(msg))
     except KeyboardInterrupt:
         print('')
         sys.exit(0)
