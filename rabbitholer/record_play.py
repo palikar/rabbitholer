@@ -85,7 +85,7 @@ def log_message(pickler, method, props, msg):
 
 def record(args):
     try:
-        with RabbitDumper(args) as dump, MsgPickler(args.output) as pickler:
+        with RabbitDumper(args) as dump, MsgPickler(args) as pickler:
             debug_cyan('Recording messages...')
             dump.receive(
                 lambda mthd, prop, msg: log_message(
@@ -95,3 +95,8 @@ def record(args):
     except KeyboardInterrupt:
         print('')
         sys.exit(0)
+
+
+def list_messges(args):
+    pass
+    

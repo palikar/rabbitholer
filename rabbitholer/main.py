@@ -12,6 +12,7 @@ from rabbitholer.logger import setup_logging
 from rabbitholer.rabbit_dumper import RabbitDumper
 from rabbitholer.record_play import play
 from rabbitholer.record_play import record
+from rabbitholer.record_play import list_messges
 from rabbitholer.version import VERSION
 
 VERSION_MSG = [
@@ -162,7 +163,7 @@ def get_arg_parser():
 
     record_parser.add_argument(
         '--append', '-a', dest='append',
-        action='store_true', required=True, default=False,
+        action='store_true', required=False, default=False,
         help='Append the recorded messages to the output given file.',
     )
 
@@ -178,6 +179,18 @@ def get_arg_parser():
         action='store', required=True, default='rabbitmq_msgs.msg',
         help='The input file where the mesasges were previously stored',
     )
+
+    
+    play_parser = subparsers.add_parser(
+        'list-msgs',
+        help='Print recorded messages',
+        description='Print the recorded messages in a file to the standard output')
+
+    play_parser.add_argument(
+        'file', action='store',
+        help='The input file where the mesasges were previously stored',
+    )
+
 
     return parser
 
@@ -255,6 +268,7 @@ COMMANDS['read'] = read
 COMMANDS['pipe'] = pipe
 COMMANDS['record'] = record
 COMMANDS['play'] = play
+COMMANDS['list-msgs'] = list_messges
 
 
 def main():
