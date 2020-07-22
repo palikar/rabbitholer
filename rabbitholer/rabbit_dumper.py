@@ -63,9 +63,10 @@ class RabbitDumper:
         self.destroy()
 
     def new_msg(self, _, method, properties, body):  # noqa: F831
-        log = body if len(body) < 10 else body[:9].decode('utf-8') + '...'
+        body = body.decode('utf-8', 'ignore')
+        log = body if len(body) < 10 else body[:9] + '...'
         debug_cyan(f'New message received: {log}')
-        msg = Message(body.decode('utf-8'), properties.headers, method.exchange, method.routing_key)
+        msg = Message(body, properties.headers, method.exchange, method.routing_key)
         self.callback(msg)
 
     def send(self, msg, headers=None, key=None):
