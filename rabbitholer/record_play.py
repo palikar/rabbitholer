@@ -37,18 +37,19 @@ class MsgPickler:
     def flush(self):
         if not self.dirty:
             return
-        with open(self.output, 'ab') as fd:
-            debug_cyan(f'Flushing messages in {self.output}')
-            for msg in self.cache:
-                pickle.dump(msg, fd)
+        debug_cyan(f'Flushing messages in {self.output}')
+        for msg in self.cache:
+            pickle.dump(msg, fd)
         self.cache.clear()
         self.dirty = False
 
     def __enter__(self):
+        self.fd = open(self.output, 'ab')
         return self
 
     def __exit__(self, *_):
         self.flush()
+        self.fd.close()
 
 
 def play(args):

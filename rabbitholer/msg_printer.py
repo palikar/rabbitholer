@@ -21,8 +21,11 @@ class MessagePrinter:
 
 
     def json_msg(self, msg):
-        json_formated_msg = json.dumps(json.loads(msg), indent=2)
-        print(json_formated_msg)
+        try:
+            json_formated_msg = json.dumps(json.loads(msg), indent=2)
+            print(json_formated_msg)
+        except json.JSONDecodeError:
+            print(msg)
         
 
     def print_message(self, msg):
