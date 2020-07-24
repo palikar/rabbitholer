@@ -101,6 +101,13 @@ def get_arg_parser():
         help='Format string for the printed messages.',
     )
 
+    
+    printer_parser.add_argument(
+        '--json', '-j', action='store_true', default=False,
+        required=False, dest='json',
+        help='Format the body of the message a a json',
+    )
+
     subparsers = parser.add_subparsers(
         title='Commands', description='A list\
     of the avialble commands', dest='command', metavar='Command',

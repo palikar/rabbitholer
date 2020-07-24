@@ -1,8 +1,11 @@
+import json
+
 class MessagePrinter:
 
     def __init__(self, args):
         self.args = args
         self.format = args.format
+
 
     def format_msg(self, msg):
         string = self.format
@@ -16,8 +19,18 @@ class MessagePrinter:
 
         print(string)
 
+
+    def json_msg(self, msg):
+        json_formated_msg = json.dumps(json.loads(msg), indent=2)
+        print(json_formated_msg)
+        
+
     def print_message(self, msg):
-        if not self.format:
-            print(msg.body)
-        else:
+
+        if self.format:
             self.format_msg(msg)
+        elif self.args.json:
+            self.json_msg(msg.body)
+        else:
+            print(msg.body)
+            
