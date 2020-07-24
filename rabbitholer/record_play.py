@@ -1,6 +1,8 @@
 import pickle
 import sys
 import time
+import bz2
+import os
 
 from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
@@ -8,14 +10,20 @@ from rabbitholer.msg_printer import MessagePrinter
 from rabbitholer.rabbit_dumper import Message
 from rabbitholer.rabbit_dumper import RabbitDumper
 
+def sanitize_input_variable(var):
+    var = os.path.expanduser(var)
+    var = os.path.expandvars(var)
+    return var
+
 
 class MsgPickler:
 
     def __init__(self, args):
         self.args = args
 
-        self.output = args.output
+        self.output = sanitize_input_variable(args.output)
         self.append = args.append
+        self.compress = args.compress
 
         self.cache = []
         self.dirty = True
@@ -39,21 +47,28 @@ class MsgPickler:
             return
         debug_cyan(f'Flushing messages in {self.output}')
         for msg in self.cache:
-            pickle.dump(msg, fd)
+            pickle.dump(msg, self.fd)
         self.cache.clear()
         self.dirty = False
 
     def __enter__(self):
-        self.fd = open(self.output, 'ab')
+        self.fd = MsgPickler.open_file(self.output, 'a', self.args)
         return self
 
     def __exit__(self, *_):
         self.flush()
         self.fd.close()
 
+    @staticmethod
+    def open_file(file, mode, args):
+        if args.compress:
+            return bz2.BZ2File(file, mode)
+        else:
+            return open(file, mode + 'b')
+        
 
 def play(args):
-    with RabbitDumper(args) as dump, open(args.input, 'rb') as fd:
+    with RabbitDumper(args) as dump, MsgPickler.open_file(args.output, 'a', args) as fd:
         try:
             while 1:
                 msg = pickle.load(fd)
@@ -88,7 +103,7 @@ def record(args):
 
 def list_messges(args):
     try:
-        with open(args.file, 'rb') as fd:
+        with MsgPickler.open_file(args.file, 'r', args) as fd:
             printer = MessagePrinter(args)
             while 1:
                 msg = pickle.load(fd)

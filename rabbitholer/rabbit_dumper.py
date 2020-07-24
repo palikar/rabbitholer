@@ -125,7 +125,8 @@ routing key {self.routing_key}')
 
     def destroy(self):
         debug_cyan('Closing connection to the broker.')
-        self.channel.queue_unbind(self.queue)
-        self.channel.queue_purge(self.queue)
+        if self.queue:
+            self.channel.queue_unbind(self.queue, exchange=self.exchange)
+            self.channel.queue_purge(self.queue)
         self.channel.close()
         self.connection.close()

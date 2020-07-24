@@ -183,6 +183,14 @@ def get_arg_parser():
         help='Append the recorded messages to the output given file.',
     )
 
+    
+    record_parser.add_argument(
+        '--compress', '-c', dest='compress',
+        action='store_true', required=False, default=False,
+        help='Compress the binary file where the messages are saved',
+    )
+
+
     play_parser = subparsers.add_parser(
         'play',
         help='Replay previosly recorded massages',
@@ -194,6 +202,12 @@ def get_arg_parser():
         '--input', '-i', '-o', dest='input',
         action='store', required=True, default='rabbitmq_msgs.msg',
         help='The input file where the mesasges were previously stored',
+    )
+    
+    play_parser.add_argument(
+        '--compress', '-c', dest='compress',
+        action='store_true', required=False, default=False,
+        help='Signify that the give mesage file is compressed',
     )
 
     list_parser = subparsers.add_parser(
@@ -207,6 +221,13 @@ def get_arg_parser():
         'file', action='store',
         help='The input file where the mesasges were previously stored',
     )
+    
+    list_parser.add_argument(
+        '--compress', '-c', dest='compress',
+        action='store_true', required=False, default=False,
+        help='Signify that the give mesage file is compressed',
+    )
+
 
     return parser
 
