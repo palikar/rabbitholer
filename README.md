@@ -38,27 +38,37 @@ make install
 A basic run of `rabitholer --help` gives:
 
 ```
-usage: rabitholer [-h] [--version] [--verbose] Command ...
+usage: rabitholer [-h] [--version] [--verbose] [--very-verbose]
+                  [--config CONFIG]
+                  Command ...
 
 Interact with RabbitMQ exhanges and queues
 
 optional arguments:
-  -h, --help      show this help message and exit
-  --version, -v   Print veriosn inormation
-  --verbose, -vv  Print a lot of information about the execution.
+  -h, --help            show this help message and exit
+  --version, -V         Print veriosn inormation
+  --verbose, -v         Print information about the execution.
+  --very-verbose, -vv   Print a lot of information about the execution.
+  --config CONFIG, -c CONFIG
+                        Specify a configuration file. If not given,
+                        '~/.config/rabbitholer/config.py' will be used
 
 Commands:
   A list of the avialble commands
 
   Command
-    send          Send a message to an exchange
-    read          Send a messages to an exchange read from the standard input.
-    pipe          Create a named pipe connected to an exchange
-    monitor       Monitor the messges on an exchange
+    send                Send a message to an exchange
+    read                Send a messages to an exchange read from the standard
+                        input.
+    pipe                Create a named pipe connected to an exchange
+    monitor             Monitor the messges on an exchange
+    record              Record messages with specific routing key
+    play                Replay previosly recorded massages
+    list-msgs           Print recorded messages
 
 ```
 
-Currently there are four supported commands: send, read, pipe and monitor. All commands have certain arguments that are common between all of them. Those instruct the application how to connect to the server. They include:
+Currently there are four supported commands: send, read, pipe, monitor, record and play (also an extra utility command &#x2013; list-msgs). All commands have certain arguments that are common between all of them. Those instruct the application how to connect to the server. They include:
 
 | Argument           | Description                                                         |
 |------------------ |------------------------------------------------------------------- |
@@ -118,3 +128,21 @@ then you can do something like:
 ```sh
 echo '<msg>' > ./rabbithole
 ```
+
+**record**: Record incoming messages and save them in a file so that later they can be replayed. This command aims to be similar to [rosbag record](http://wiki.ros.org/rosbag/Commandline#rosbag_record). RabbitMQ doesn&rsquo;t really have the equivalent of a [rosbag](http://wiki.ros.org/rosbag/Commandline#rosbag_record) but the concept is extremely useful when it comes to messaging between applications. I wanted such functionality for a long time so I implemented it here. The usage is simple:
+
+```sh
+rabbitholer.py record [...] -o ~/car_msgs.p
+```
+
+This will save the recorded messages in the file `~/car_msgs.p`. The messages are recorded through [pickling](https://docs.python.org/3/library/pickle.html). Some meta information about the messages is saved (exchange, routing key, timestamps&#x2026;) so that they can be alter replayed exactly as they originally have been. The file can also be compressed with the `-c` flag. The used compression is [bzip2](https://en.wikipedia.org/wiki/Bzip2).
+
+**play**
+
+**list-msgs**
+
+
+## Message formatting
+
+
+## Configuration
