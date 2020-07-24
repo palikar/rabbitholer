@@ -1,31 +1,10 @@
 #!/usr/bin/env python3
-import os
-import sys
 from distutils.core import setup
-
 import setuptools
-
-from rabbitholer.version import __version__
-
-
-def package_files(directory):
-    paths = []
-    for (path, directories, filenames) in os.walk(directory):
-        for filename in filenames:
-            paths.append(os.path.join('..', path, filename))
-    return paths
-
-
-if sys.version_info < (3, 3):
-    print(
-        'THIS MODULE REQUIRES PYTHON 3.3+. YOU ARE CURRENTLY\
-    USING PYTHON {}'.format(sys.version),
-    )
-    sys.exit(1)
 
 setup(
     name='rabbitholer',
-    version=__version__,
+    version='0.0.2',
     include_package_data=True,
     author='Stanislav Arnaudov',
     author_email='stanislv_ts@abv.bg',
