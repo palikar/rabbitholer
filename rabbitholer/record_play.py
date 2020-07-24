@@ -70,7 +70,7 @@ def play(args):
 
 
 def log_message(pickler, msg):
-    msg.timestamp = msg.props.timestamp if msg.props.timestamp else time.time()
+    msg.timestamp = msg.props.timestamp if msg.props and msg.props.timestamp else time.time()
     debug_cyan(f'Saving message from {msg.exchange} and with key {msg.routing_key}')
     pickler.push_msg(msg)
 
