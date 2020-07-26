@@ -154,5 +154,42 @@ rabbitholer.py list-msgs ~/car_msgs.p
 
 ## Message formatting
 
+All commands that print messages in anyway (**play**, **list-msgs** and **monitor**) can take certain command line arguments to format the output. Those control how an individual message gets printed to the standard output. The arguments are:
+
+```sh
+--format FORMAT, -f FORMAT   Format string for the printed messages.
+--json, -j                   Format the body of the message a json
+```
+
+`--format--` expects a format string that will be expanded during printing. The following table summarizes the possible tokens in the format string.
+
+| Token | Meaning                                        |
+| `%b`  | The body of the message                        |
+| `%r`  | The routing key of the messages                |
+| `%e`  | The exchange where the messages is coming from |
+| `%h`  | The headers of the message                     |
+| `%%`  | A literal &rsquo;%&rsquo; character            |
+
+`--json` will parse the body of the messages as a JSON and will pretty printed to the standard output.
+
 
 ## Configuration
+
+If present, rabbitholer will read (execute!) the file `~/.config/rabbitholer/config.py`. It servers as a configuration and **it is a full blown python script** so be careful what configuration you have in the file because potential malicious code could be executed. The file should contain a single dictionary object named `config` that will be used as configuration. The next snippets illustrates the possible options:
+
+```python
+config = {}
+
+# the default server to be used
+config['server'] = 'localhost'
+
+# the default rabbitmq exahnge to be used for sending mesages
+config['exchange'] = 'amq.topic'
+
+# the default routing key to be used for sending and receiving mesages
+config['routing_key'] = 'home'
+
+# during recording of mesasges, the number of messages after which 
+# the messages will be synchronized with the file on the filesystem
+config['pickler_cache_size'] = 50
+```
