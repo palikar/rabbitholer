@@ -160,6 +160,26 @@ rabbitholer.py list-msgs ~/car_msgs.p
 
 ** Message formatting
 
+All commands that print messages in anyway (*play*, *list-msgs* and *monitor*) can take certain command line arguments to format the output. Those control how an individual message gets printed to the standard output. The arguments are:
+#+BEGIN_SRC sh
+  --format FORMAT, -f FORMAT   Format string for the printed messages.
+  --json, -j                   Format the body of the message a json
+#+END_SRC
+
+=--format--= expects a format string that will be expanded during printing. The following table summarizes the possible tokens in the format string.
+
+|-------+------------------------------------------------|
+| Token | Meaning                                        |
+|-------+------------------------------------------------|
+| =%b=  | The body of the message                        |
+| =%r=  | The routing key of the messages                |
+| =%e=  | The exchange where the messages is coming from |
+| =%h=  | The headers of the message                     |
+| =%%=  | A literal '%' character                        |
+|-------+------------------------------------------------|
+
+=--json= will parse the body of the messages as a JSON and will pretty printed to the standard output.
+
 ** Configuration
 
 

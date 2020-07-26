@@ -105,7 +105,7 @@ def get_arg_parser():
     printer_parser.add_argument(
         '--json', '-j', action='store_true', default=False,
         required=False, dest='json',
-        help='Format the body of the message a a json',
+        help='Format the body of the message a json',
     )
 
     subparsers = parser.add_subparsers(
