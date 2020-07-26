@@ -137,9 +137,19 @@ rabbitholer.py record [...] -o ~/car_msgs.p
 
 This will save the recorded messages in the file `~/car_msgs.p`. The messages are recorded through [pickling](https://docs.python.org/3/library/pickle.html). Some meta information about the messages is saved (exchange, routing key, timestamps&#x2026;) so that they can be alter replayed exactly as they originally have been. The file can also be compressed with the `-c` flag. The used compression is [bzip2](https://en.wikipedia.org/wiki/Bzip2).
 
-**play**
+**play**: Replay messages that have been previously saved through the **record** command. As previously said, a timestamp of the messages is saved, so they will be replayed in a temporarily equivalent manner as they have been recorded (i.e. the relative time between two consecutive replayed messages will be same as it was during the recording of those messages). The command can be used like:
 
-**list-msgs**
+```sh
+# those two are equivalent
+rabbitholer.py play -o ~/car_msgs.p
+rabbitholer.py play -i ~/car_msgs.p
+```
+
+**list-msgs**: List the messages that have been previously saved through the **record** command. This is a utility command used to examine the contents of a file with recorded messages.
+
+```sh
+rabbitholer.py list-msgs ~/car_msgs.p
+```
 
 
 ## Message formatting
