@@ -9,11 +9,7 @@ from rabbitholer.logger import debug_cyan
 from rabbitholer.msg_printer import MessagePrinter
 from rabbitholer.rabbit_dumper import Message
 from rabbitholer.rabbit_dumper import RabbitDumper
-
-def sanitize_input_variable(var):
-    var = os.path.expanduser(var)
-    var = os.path.expandvars(var)
-    return var
+from rabbitholer.utils import sanitize_input_variable
 
 
 class MsgPickler:
@@ -26,7 +22,8 @@ class MsgPickler:
         self.compress = args.compress
 
         self.cache = []
-        self.dirty = True
+        self.cahce_dirty = True
+        self.cache_size = args.pickler_cache_size if args.pickler_cache_size else 20
 
         if not self.append:
             with open(self.output, 'wb'):
@@ -38,18 +35,18 @@ class MsgPickler:
 
     def push_msg(self, msg):
         self.cache.append(msg)
-        self.dirty = True
-        if len(self.cache) > 20:
+        self.cahce_dirty = True
+        if len(self.cache) > self.cache_size:
             self.flush()
 
     def flush(self):
-        if not self.dirty:
+        if not self.cahce_dirty:
             return
         debug_cyan(f'Flushing messages in {self.output}')
         for msg in self.cache:
             pickle.dump(msg, self.fd)
         self.cache.clear()
-        self.dirty = False
+        self.cahce_dirty = False
 
     def __enter__(self):
         self.fd = MsgPickler.open_file(self.output, 'a', self.args)
