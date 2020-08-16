@@ -84,7 +84,7 @@ class Arguments(unittest.TestCase):
     def test_very_verbose(self):
         parser = get_arg_parser()
 
-        args = ['-vvv']
+        args = ['-vv']
         parsed = parser.parse_args(args)
         self.assertTrue(parsed.very_verbose)
 
@@ -95,7 +95,7 @@ class Arguments(unittest.TestCase):
     def test_verbose(self):
         parser = get_arg_parser()
 
-        args = ['-vv']
+        args = ['-v']
         parsed = parser.parse_args(args)
         self.assertTrue(parsed.verbose)
 
@@ -106,7 +106,7 @@ class Arguments(unittest.TestCase):
     def test_version(self):
         parser = get_arg_parser()
         with self.assertRaises(SystemExit):
-            args = ['-v']
+            args = ['-V']
             parser.parse_args(args)
         with self.assertRaises(SystemExit):
             args = ['--version']

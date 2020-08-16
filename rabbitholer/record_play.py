@@ -1,8 +1,7 @@
+import bz2
 import pickle
 import sys
 import time
-import bz2
-import os
 
 from rabbitholer.logger import debug
 from rabbitholer.logger import debug_cyan
@@ -25,6 +24,8 @@ class MsgPickler:
         self.cahce_dirty = True
         self.cache_size = args.pickler_cache_size if args.pickler_cache_size else 20
 
+        self.file_descriptor = None
+
         if not self.append:
             with open(self.output, 'wb'):
                 pass
@@ -44,31 +45,31 @@ class MsgPickler:
             return
         debug_cyan(f'Flushing messages in {self.output}')
         for msg in self.cache:
-            pickle.dump(msg, self.fd)
-        self.cache.clear()
-        self.cahce_dirty = False
+            pickle.dump(msg, self.file_descriptor)
+            self.cache.clear()
+            self.cahce_dirty = False
 
     def __enter__(self):
-        self.fd = MsgPickler.open_file(self.output, 'a', self.args)
+        self.file_descriptor = MsgPickler.open_file(self.output, 'a', self.args)
         return self
 
     def __exit__(self, *_):
         self.flush()
-        self.fd.close()
+        self.file_descriptor.close()
 
     @staticmethod
     def open_file(file, mode, args):
         if args.compress:
             return bz2.BZ2File(file, mode)
-        else:
-            return open(file, mode + 'b')
-        
+
+        return open(file, mode + 'b')
+
 
 def play(args):
-    with RabbitDumper(args) as dump, MsgPickler.open_file(args.output, 'a', args) as fd:
+    with RabbitDumper(args) as dump, MsgPickler.open_file(args.output, 'a', args) as file_descriptor:
         try:
             while 1:
-                msg = pickle.load(fd)
+                msg = pickle.load(file_descriptor)
 
                 if msg.body is None:
                     prev_time = msg.timestamp
@@ -100,10 +101,10 @@ def record(args):
 
 def list_messges(args):
     try:
-        with MsgPickler.open_file(args.file, 'r', args) as fd:
+        with MsgPickler.open_file(args.file, 'r', args) as file_descriptor:
             printer = MessagePrinter(args)
             while 1:
-                msg = pickle.load(fd)
+                msg = pickle.load(file_descriptor)
                 if msg.body is None:
                     continue
                 printer.print_message(msg)

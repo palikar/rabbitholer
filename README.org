@@ -144,7 +144,7 @@ echo '<msg>' > ./rabbithole
 #+BEGIN_SRC sh
 rabbitholer.py record [...] -o ~/car_msgs.p
 #+END_SRC
-This will save the recorded messages in the file =~/car_msgs.p=. The messages are recorded through [[https://docs.python.org/3/library/pickle.html][pickling]]. Some meta information about the messages is saved (exchange, routing key, timestamps...) so that they can be alter replayed exactly as they originally have been. The file can also be compressed with the =-c= flag. The used compression is [[https://en.wikipedia.org/wiki/Bzip2][bzip2]]. 
+This will save the recorded messages in the file =~/car_msgs.p=. The messages are recorded through [[https://docs.python.org/3/library/pickle.html][pickling]]. Some meta information about the messages is saved (exchange, routing key, timestamps...) so that they can be alter replayed exactly as they originally have been. The file can also be compressed with the =-c= flag. The used compression is [[https://en.wikipedia.org/wiki/Bzip2][bzip2]].
 
 *play*: Replay messages that have been previously saved through the *record* command. As previously said, a timestamp of the messages is saved, so they will be replayed in a temporarily equivalent manner as they have been recorded (i.e. the relative time between two consecutive replayed messages will be same as it was during the recording of those messages). The command can be used like:
 #+BEGIN_SRC sh
@@ -196,12 +196,10 @@ config['exchange'] = 'amq.topic'
 # the default routing key to be used for sending and receiving mesages
 config['routing_key'] = 'home'
 
-# during recording of mesasges, the number of messages after which 
+# during recording of mesasges, the number of messages after which
 # the messages will be synchronized with the file on the filesystem
 config['pickler_cache_size'] = 50
 #+END_SRC
 
 
 #  LocalWords:  Rabbitholer Todos
-
-

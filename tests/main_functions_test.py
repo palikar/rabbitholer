@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from io import StringIO
 from unittest import mock
 
-from rabbitholer.main import monitor
 from rabbitholer.main import read
 from rabbitholer.main import send
 
@@ -73,38 +72,6 @@ class CommandFunctions(unittest.TestCase):
             RabbitDumper.return_value.__enter__
             .return_value.send.assert_any_call('msg2')
         )
-
-    @mock.patch(
-        'rabbitholer.main.RabbitDumper',
-        autospec=True,
-    )
-    def test_monitor(self, RabbitDumper):
-        RabbitDumper.return_value.__enter__.return_value = mock.Mock()
-
-        args = mock.Mock()
-        args.queue = 'general'
-        args.exchange = 'general'
-        args.routing_key = 'general'
-        args.server = 'general'
-
-        monitor(args)
-
-        (
-            RabbitDumper.return_value.__enter__
-            .return_value.receive.assert_called_once()
-        )
-
-        call = (
-            RabbitDumper.return_value.__enter__
-            .return_value.receive.call_args_list[0]
-        )
-        callback, kwargs = call
-
-        with captured_output() as (out, err):
-            callback[0]('general')
-
-        line = out.getvalue()
-        self.assertEqual('general\n', line)
 
 
 if __name__ == '__main__':

@@ -189,7 +189,7 @@ config['exchange'] = 'amq.topic'
 # the default routing key to be used for sending and receiving mesages
 config['routing_key'] = 'home'
 
-# during recording of mesasges, the number of messages after which 
+# during recording of mesasges, the number of messages after which
 # the messages will be synchronized with the file on the filesystem
 config['pickler_cache_size'] = 50
 ```

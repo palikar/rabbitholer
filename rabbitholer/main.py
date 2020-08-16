@@ -101,7 +101,6 @@ def get_arg_parser():
         help='Format string for the printed messages.',
     )
 
-    
     printer_parser.add_argument(
         '--json', '-j', action='store_true', default=False,
         required=False, dest='json',
@@ -183,13 +182,11 @@ def get_arg_parser():
         help='Append the recorded messages to the output given file.',
     )
 
-    
     record_parser.add_argument(
         '--compress', '-c', dest='compress',
         action='store_true', required=False, default=False,
         help='Compress the binary file where the messages are saved',
     )
-
 
     play_parser = subparsers.add_parser(
         'play',
@@ -203,7 +200,7 @@ def get_arg_parser():
         action='store', required=True, default='rabbitmq_msgs.msg',
         help='The input file where the mesasges were previously stored',
     )
-    
+
     play_parser.add_argument(
         '--compress', '-c', dest='compress',
         action='store_true', required=False, default=False,
@@ -221,13 +218,12 @@ def get_arg_parser():
         'file', action='store',
         help='The input file where the mesasges were previously stored',
     )
-    
+
     list_parser.add_argument(
         '--compress', '-c', dest='compress',
         action='store_true', required=False, default=False,
         help='Signify that the give mesage file is compressed',
     )
-
 
     return parser
 
@@ -237,7 +233,7 @@ def monitor(args):
         printer = MessagePrinter(args)
         with RabbitDumper(args) as dump:
             debug_cyan('Monitoring for messages:')
-            dump.receive(lambda msg: printer.print_message(msg))
+            dump.receive(printer.print_message)
     except KeyboardInterrupt:
         print('')
         sys.exit(0)

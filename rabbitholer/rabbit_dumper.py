@@ -14,9 +14,6 @@ class Message:
         self.exchange = exchange
         self.routing_key = routing_key
 
-        def __repr__(self):
-            return self.body
-
 
 class RabbitDumper:
 
@@ -30,6 +27,7 @@ class RabbitDumper:
         self.server = args.server
 
         self.callback = None
+        self.full_msg = None
 
         debug_cyan(f'Trying to open connection to {args.server}')
         try:

@@ -1,11 +1,11 @@
 import json
 
+
 class MessagePrinter:
 
     def __init__(self, args):
         self.args = args
         self.format = args.format
-
 
     def format_msg(self, msg):
         string = self.format
@@ -19,14 +19,13 @@ class MessagePrinter:
 
         print(string)
 
-
-    def json_msg(self, msg):
+    @staticmethod
+    def json_msg(msg):
         try:
             json_formated_msg = json.dumps(json.loads(msg), indent=2)
             print(json_formated_msg)
         except json.JSONDecodeError:
             print(msg)
-        
 
     def print_message(self, msg):
 
@@ -36,4 +35,3 @@ class MessagePrinter:
             self.json_msg(msg.body)
         else:
             print(msg.body)
-            
