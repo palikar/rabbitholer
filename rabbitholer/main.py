@@ -87,7 +87,7 @@ def get_arg_parser():
 
     settings_parser.add_argument(
         '--server', '-s', action='store',
-        metavar='Server', default='taygeta',
+        metavar='Server', default=argparse.SUPPRESS,
         required=False, dest='server',
         help='The server where the\
                                  RabbiMQ server is running',
@@ -105,6 +105,16 @@ def get_arg_parser():
         '--json', '-j', action='store_true', default=False,
         required=False, dest='json',
         help='Format the body of the message a json',
+    )
+
+    printer_parser.add_argument(
+        '--no-color', '-n', action='store_true', default=False, dest='no_color',
+        help='Supress any color in the output',
+    )
+
+    printer_parser.add_argument(
+        '--show-route', '-se', action='store_true', default=False, dest='show_routing_key',
+        help='Display the the routing key of messages while printing in simple mode.',
     )
 
     subparsers = parser.add_subparsers(
@@ -340,15 +350,18 @@ def main():
     config = importlib.util.module_from_spec(config_spec)
     config_spec.loader.exec_module(config)
 
-    args_dict = vars(args)
     if not hasattr(config, 'config'):
         debug('The configuration file does not define a config dict')
 
-    args_dict.update(config.config)
-    args_dict.update((k, os.environ[k])
-                     for k in args_dict.keys() & os.environ.keys())
+    for key in vars(args):
+        value =  getattr(args, key)
+        if value and config.config.keys():
+            config.config[key] = value
+            
+    config.config.update((k, os.environ[k])
+                     for k in config.config.keys() & os.environ.keys())
 
-    args_dict = argparse.Namespace(**args_dict)
+    args = argparse.Namespace(**config.config)
 
     debug(f'Command called: {args.command}')
     debug(f'Arguments: {vars(args)}')

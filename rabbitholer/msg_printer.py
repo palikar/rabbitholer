@@ -1,11 +1,21 @@
 import json
 
 
+RESET = '\033[0m'
+BOLD = '\033[1m'
+GREEN = '\033[92m'
+BLUE = '\033[94m'
+CYAN = '\033[96m'
+RED = '\033[38;5;197m'
+
+
 class MessagePrinter:
 
     def __init__(self, args):
         self.args = args
         self.format = args.format
+        self.color = not args.no_color
+        self.show_route = args.show_routing_key
 
     def format_msg(self, msg):
         string = self.format
@@ -17,7 +27,8 @@ class MessagePrinter:
         string = string.replace('%e', str(msg.exchange))
         string = string.replace('%h', str(msg.props))
 
-        print(string)
+        sys.stdout.buffer.write(bytes(string + '\n', 'utf-8'))
+        sys.stdout.buffer.flush()
 
     @staticmethod
     def json_msg(msg):
@@ -27,6 +38,16 @@ class MessagePrinter:
         except json.JSONDecodeError:
             print(msg)
 
+    def simple_print(self, msg):
+        if self.color:
+            preamble = RED + msg.routing_key + ':' + RESET if self.show_route else ''
+        else:
+            preamble = msg.routing_key + ':' if self.show_route else ''
+
+        sys.stdout.buffer.write(bytes(preamble + msg.body + '\n', 'utf-8'))
+        sys.stdout.buffer.flush()
+        
+
     def print_message(self, msg):
 
         if self.format:
@@ -34,4 +55,5 @@ class MessagePrinter:
         elif self.args.json:
             self.json_msg(msg.body)
         else:
-            print(msg.body)
+            self.simple_print(msg)
+            
