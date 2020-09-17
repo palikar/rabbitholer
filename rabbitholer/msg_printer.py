@@ -1,4 +1,5 @@
 import json
+import sys
 
 
 RESET = '\033[0m'
@@ -46,7 +47,6 @@ class MessagePrinter:
 
         sys.stdout.buffer.write(bytes(preamble + msg.body + '\n', 'utf-8'))
         sys.stdout.buffer.flush()
-        
 
     def print_message(self, msg):
 
@@ -56,4 +56,3 @@ class MessagePrinter:
             self.json_msg(msg.body)
         else:
             self.simple_print(msg)
-            

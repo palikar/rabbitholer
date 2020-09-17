@@ -44,13 +44,13 @@ def get_arg_parser():
 
     parser.add_argument(
         '--verbose', '-v', dest='verbose',
-        action='store_true', default=False,
+        action='store_true', default=None,
         help='Print information about the execution.',
     )
 
     parser.add_argument(
         '--very-verbose', '-vv', dest='very_verbose',
-        action='store_true', default=False,
+        action='store_true', default=None,
         help='Print a lot of information about the execution.',
     )
 
@@ -66,7 +66,7 @@ def get_arg_parser():
     settings_parser.add_argument(
         '--exchange', '-e', dest='exchange',
         metavar='Exchange', action='store',
-        required=False, default=DEFAULT_EXCHANGE,
+        required=False, default=None,
         help='The exchange where\
                                  the message will be send',
     )
@@ -87,7 +87,7 @@ def get_arg_parser():
 
     settings_parser.add_argument(
         '--server', '-s', action='store',
-        metavar='Server', default=argparse.SUPPRESS,
+        metavar='Server', default=None,
         required=False, dest='server',
         help='The server where the\
                                  RabbiMQ server is running',
@@ -102,18 +102,18 @@ def get_arg_parser():
     )
 
     printer_parser.add_argument(
-        '--json', '-j', action='store_true', default=False,
+        '--json', '-j', action='store_true', default=None,
         required=False, dest='json',
         help='Format the body of the message a json',
     )
 
     printer_parser.add_argument(
-        '--no-color', '-n', action='store_true', default=False, dest='no_color',
+        '--no-color', '-n', action='store_true', default=None, dest='no_color',
         help='Supress any color in the output',
     )
 
     printer_parser.add_argument(
-        '--show-route', '-se', action='store_true', default=False, dest='show_routing_key',
+        '--show-route', '-se', action='store_true', default=None, dest='show_routing_key',
         help='Display the the routing key of messages while printing in simple mode.',
     )
 
@@ -194,7 +194,7 @@ def get_arg_parser():
 
     record_parser.add_argument(
         '--compress', '-c', dest='compress',
-        action='store_true', required=False, default=False,
+        action='store_true', required=False, default=None,
         help='Compress the binary file where the messages are saved',
     )
 
@@ -213,7 +213,7 @@ def get_arg_parser():
 
     play_parser.add_argument(
         '--compress', '-c', dest='compress',
-        action='store_true', required=False, default=False,
+        action='store_true', required=False, default=None,
         help='Signify that the give mesage file is compressed',
     )
 
@@ -231,7 +231,7 @@ def get_arg_parser():
 
     list_parser.add_argument(
         '--compress', '-c', dest='compress',
-        action='store_true', required=False, default=False,
+        action='store_true', required=False, default=None,
         help='Signify that the give mesage file is compressed',
     )
 
@@ -354,12 +354,12 @@ def main():
         debug('The configuration file does not define a config dict')
 
     for key in vars(args):
-        value =  getattr(args, key)
-        if value and config.config.keys():
+        value = getattr(args, key)
+        if value is not None or key not in config.config.keys():
             config.config[key] = value
-            
+
     config.config.update((k, os.environ[k])
-                     for k in config.config.keys() & os.environ.keys())
+                         for k in config.config.keys() & os.environ.keys())
 
     args = argparse.Namespace(**config.config)
 
